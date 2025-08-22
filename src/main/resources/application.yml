@@ -23,6 +23,8 @@ spring:
 
 ---
 spring.config.activate.on-profile: local, test
+spring.config.import:
+  - classpath:/config/swagger.yml
 
 spring:
   datasource:
