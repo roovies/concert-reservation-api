@@ -38,6 +38,9 @@ dependencies {
     // DB
 	runtimeOnly("com.mysql:mysql-connector-j")
 
+	// Spring Data Redis
+	implementation("org.springframework.boot:spring-boot-starter-data-redis")
+
 	// OpenAPI
 	implementation("org.springdoc:springdoc-openapi-starter-webmvc-ui:2.1.0")
 
