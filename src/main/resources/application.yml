@@ -3,6 +3,7 @@ spring:
     name: concertreservation
   profiles:
     active: local # 애플리케이션 실행 시 'local' 프로파일 활성화
+  config:
     import:
       - classpath:/config/swagger.yml
 
