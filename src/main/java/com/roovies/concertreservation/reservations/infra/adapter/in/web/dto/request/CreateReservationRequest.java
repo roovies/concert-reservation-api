@@ -6,6 +6,7 @@ import jakarta.validation.constraints.NotNull;
 
 import java.time.LocalDate;
 
+@Schema(description = "좌석 예약 요청 DTO")
 public record CreateReservationRequest(
         @Schema(description = "콘서트 ID", example = "1001")
         @NotNull(message = "콘서트 ID는 필수입니다.")

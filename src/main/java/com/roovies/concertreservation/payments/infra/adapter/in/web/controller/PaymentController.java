@@ -1,6 +1,5 @@
 package com.roovies.concertreservation.payments.infra.adapter.in.web.controller;
 
-import com.roovies.concertreservation.concerts.infra.adapter.in.web.response.GetConcertsResponse;
 import com.roovies.concertreservation.payments.infra.adapter.in.web.dto.enums.PaymentStatus;
 import com.roovies.concertreservation.payments.infra.adapter.in.web.dto.request.CancelPaymentRequest;
 import com.roovies.concertreservation.payments.infra.adapter.in.web.dto.request.CreatePaymentRequest;

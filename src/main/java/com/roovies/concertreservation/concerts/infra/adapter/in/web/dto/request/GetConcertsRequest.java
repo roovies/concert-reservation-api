@@ -1,4 +1,4 @@
-package com.roovies.concertreservation.reservations.infra.adapter.in.web.dto.request;
+package com.roovies.concertreservation.concerts.infra.adapter.in.web.dto.request;
 
 import io.swagger.v3.oas.annotations.media.Schema;
 import jakarta.validation.constraints.Min;
@@ -6,8 +6,8 @@ import jakarta.validation.constraints.PositiveOrZero;
 
 import java.time.LocalDate;
 
-@Schema(description = "예약 내역 조회 요청 DTO")
-public record GetReservationHistoryRequest(
+@Schema(description = "콘서트 목록 조회 요청 DTO")
+public record GetConcertsRequest(
         @Schema(description = "페이지 번호 (0부터 시작)", example = "0")
         @PositiveOrZero
         int page,
@@ -16,19 +16,16 @@ public record GetReservationHistoryRequest(
         @Min(1)
         int size,
 
-        @Schema(description = "정렬 기준 (예: startDate,desc / endDate,asc)", example = "timestamp,desc")
+        @Schema(description = "정렬 기준 (예: startDate,desc / price,asc)", example = "startDate,desc")
         String sort,
 
-        @Schema(description = "내역 종류 필터 (confirmed/canceled/failed)", example = "confirmed")
-        String type,
-
-        @Schema(description = "조회 시작 일시", example = "2025-01-01")
+        @Schema(description = "개최일", example = "2025-01-01")
         LocalDate startDate,
 
-        @Schema(description = "조회 종료 일시", example = "2025-08-25")
+        @Schema(description = "종료일", example = "2025-08-25")
         LocalDate endDate
 ) {
-    public GetReservationHistoryRequest {
+    public GetConcertsRequest {
         // 기본값 처리
         page = page < 0 ? 0 : page;
         size = size < 1 ? 20 : size;

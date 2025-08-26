@@ -1,13 +1,11 @@
 package com.roovies.concertreservation.reservations.infra.adapter.in.web.controller;
 
-import com.roovies.concertreservation.balance.infra.adapter.in.web.response.GetBalanceHistoryResponse;
 import com.roovies.concertreservation.reservations.infra.adapter.in.web.dto.request.CreateReservationRequest;
 import com.roovies.concertreservation.reservations.infra.adapter.in.web.dto.request.GetReservationHistoryRequest;
 import com.roovies.concertreservation.reservations.infra.adapter.in.web.dto.response.CreateReservationResponse;
 import com.roovies.concertreservation.reservations.infra.adapter.in.web.dto.response.GetAvailableSchedulesResponse;
 import com.roovies.concertreservation.reservations.infra.adapter.in.web.dto.response.GetAvailableSeatsResponse;
 import com.roovies.concertreservation.reservations.infra.adapter.in.web.dto.response.GetReservationHistoryResponse;
-import com.roovies.concertreservation.users.infra.adapter.in.web.response.GetUserResponse;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
 import io.swagger.v3.oas.annotations.Parameters;
@@ -28,8 +26,10 @@ import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.web.bind.annotation.*;
 
 import java.time.LocalDate;
+import java.time.LocalDateTime;
 import java.util.Arrays;
 import java.util.Collections;
+import java.util.List;
 
 @RestController
 @RequiredArgsConstructor
@@ -125,7 +125,7 @@ public class ReservationController {
                     @ApiResponse(
                             responseCode = "201",
                             description = "예약 신청 성공",
-                            content = @Content(schema = @Schema(implementation = GetUserResponse.class))
+                            content = @Content(schema = @Schema(implementation = CreateReservationResponse.class))
                     ),
                     @ApiResponse(
                             responseCode = "401",
@@ -171,7 +171,7 @@ public class ReservationController {
                     @ApiResponse(
                             responseCode = "200",
                             description = "예약 내역 조회 성공",
-                            content = @Content(schema = @Schema(implementation = GetBalanceHistoryResponse.class))
+                            content = @Content(schema = @Schema(implementation = GetReservationHistoryResponse.class))
                     ),
                     @ApiResponse(
                             responseCode = "400",
@@ -200,12 +200,42 @@ public class ReservationController {
             @AuthenticationPrincipal UserDetails userDetails, // TODO: Custom UserDetails 구현 필요
             @Valid @RequestBody GetReservationHistoryRequest request
     ) {
-        return ResponseEntity.status(HttpStatus.OK).body(GetReservationHistoryResponse.builder()
-                .items(Arrays.asList(1, 2, 3))
+
+        List<GetReservationHistoryResponse.ReservationHistoryItem> dummyItems = List.of(
+                GetReservationHistoryResponse.ReservationHistoryItem.builder()
+                        .id(201L)
+                        .concertId(101L)
+                        .concertTitle("K-Pop Concert 2025")
+                        .seatNumber("A-12")
+                        .status("CONFIRMED")
+                        .reservedAt(LocalDateTime.of(2025, 8, 26, 21, 0))
+                        .build(),
+                GetReservationHistoryResponse.ReservationHistoryItem.builder()
+                        .id(202L)
+                        .concertId(102L)
+                        .concertTitle("Jazz Night Live")
+                        .seatNumber("B-05")
+                        .status("CANCELLED")
+                        .reservedAt(LocalDateTime.of(2025, 8, 25, 15, 30))
+                        .build(),
+                GetReservationHistoryResponse.ReservationHistoryItem.builder()
+                        .id(203L)
+                        .concertId(103L)
+                        .concertTitle("Rock Festival 2025")
+                        .seatNumber("C-20")
+                        .status("CONFIRMED")
+                        .reservedAt(LocalDateTime.of(2025, 8, 24, 10, 45))
+                        .build()
+        );
+
+        GetReservationHistoryResponse response = GetReservationHistoryResponse.builder()
+                .items(dummyItems)
                 .page(1)
                 .size(10)
                 .totalPages(5)
                 .totalElements(48)
-                .build());
+                .build();
+
+        return ResponseEntity.ok(response);
     }
 }

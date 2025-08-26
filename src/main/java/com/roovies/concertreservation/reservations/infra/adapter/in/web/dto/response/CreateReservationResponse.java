@@ -4,6 +4,7 @@ import io.swagger.v3.oas.annotations.media.Schema;
 import lombok.Builder;
 
 @Builder
+@Schema(description = "좌석 예약 응답 DTO")
 public record CreateReservationResponse(
         @Schema(description = "예약 ID", example = "101")
         Long reservationId,
