@@ -20,7 +20,7 @@ public class ConcertRepositoryAdapter implements ConcertRepositoryPort {
     @Override
     public Optional<Concert> findById(Long id) {
         Optional<ConcertJpaEntity> entity = concertJpaRepository.findById(id);
-        if (entity.isEmpty()) {
+        if (entity.isPresent()) {
             ConcertJpaEntity concert = entity.get();
             return Optional.of(
                     Concert.create(
