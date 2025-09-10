@@ -6,4 +6,5 @@ import java.util.Optional;
 
 public interface ConcertHallRepositoryPort {
     Optional<ConcertHall> findById(Long id);
+    Optional<ConcertHall> findByIdWithSeats(Long concertHallId);
 }

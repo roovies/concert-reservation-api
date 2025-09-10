@@ -105,9 +105,70 @@ public class ReservationTest {
                 details
         ))
                 .isInstanceOf(IllegalArgumentException.class)
-                .hasMessage("현재 예약에 대한 예약 상세 정보만 등록할 수 있습니다.");
+                .hasMessage("현재 예약에 대한 예약 상세내역만 등록할 수 있습니다.");
     }
 
     @Test
-    void 예약_상세일정_추가_할수있다() {}
+    void 조회한_예약_상세내역_목록은_읽기_전용이어야_한다() {
+        // given
+        List<ReservationDetail> details = new ArrayList<>();
+        details.add(ReservationDetail.create(
+                1L,
+                5L,
+                2L,
+                4L
+        ));
+
+        Reservation reservation = Reservation.create(
+                5L,
+                1L,
+                PaymentStatus.HOLD,
+                LocalDateTime.of(2025, 9, 9, 15, 26),
+                null,
+                details
+        );
+
+        // when
+        List<ReservationDetail> result = reservation.getDetails();
+
+        // then
+        ReservationDetail newReservationDetail = ReservationDetail.create(
+                2L,
+                5L,
+                2L,
+                5L
+        );
+        assertThatThrownBy(() -> result.add(newReservationDetail))
+                .isInstanceOf(UnsupportedOperationException.class);
+    }
+
+    @Test
+    void 예약_상세내역의_스케줄ID와_좌석ID의_조합은_유니크해야_한다() {
+        // given
+        List<ReservationDetail> details = new ArrayList<>();
+        details.add(ReservationDetail.create(
+                1L,
+                5L,
+                2L,
+                5L
+        ));
+        details.add(ReservationDetail.create(
+                2L,
+                5L,
+                2L,
+                5L
+        ));
+
+        // when & then
+        assertThatThrownBy(() -> Reservation.create(
+                5L,
+                1L,
+                PaymentStatus.HOLD,
+                LocalDateTime.of(2025, 9, 9, 15, 26),
+                null,
+                details
+        ))
+                .isInstanceOf(IllegalArgumentException.class)
+                .hasMessage("동일한 날짜의 같은 좌석은 중복 예약할 수 없습니다.");
+    }
 }

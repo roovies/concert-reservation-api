@@ -10,7 +10,8 @@ import java.util.List;
 public record GetAvailableSeatsResult(
         Long concertId,
         LocalDate date,
-        List<SeatItem> seats
+        List<SeatItem> availableSeats,
+        boolean isAllReserved
 ) {
     @Builder
     public record SeatItem(
@@ -18,8 +19,7 @@ public record GetAvailableSeatsResult(
             int row,
             int seatNumber,
             SeatType seatType,
-            long price,
-            boolean isReserved
+            long price
     ) {
     }
 }
