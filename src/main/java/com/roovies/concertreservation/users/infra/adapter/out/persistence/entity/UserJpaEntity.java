@@ -2,10 +2,12 @@ package com.roovies.concertreservation.users.infra.adapter.out.persistence.entit
 
 import jakarta.persistence.Entity;
 import jakarta.persistence.Id;
+import lombok.Getter;
 
 import java.time.LocalDateTime;
 
 @Entity
+@Getter
 public class UserJpaEntity {
     @Id
     private Long id;

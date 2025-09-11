@@ -1,5 +1,6 @@
 package com.roovies.concertreservation.reservations.infra.adapter.in.web.dto.response;
 
+import com.roovies.concertreservation.concerthalls.domain.enums.SeatType;
 import io.swagger.v3.oas.annotations.media.Schema;
 import lombok.Builder;
 
@@ -15,8 +16,11 @@ public record GetAvailableSeatsResponse(
         @Schema(description = "조회 날짜", example = "2025-09-01")
         LocalDate date,
 
-        @Schema(description = "좌석 목록")
-        List<SeatItemDto> seats
+        @Schema(description = "예약 가능한 좌석 목록")
+        List<SeatItemDto> availableSeats,
+
+        @Schema(description = "매진 여부", example = "false")
+        boolean isAllReserved
 ) {
         @Builder
         @Schema(description = "예약 가능 좌석 아이템 DTO")
@@ -31,10 +35,9 @@ public record GetAvailableSeatsResponse(
                 int seatNumber,
 
                 @Schema(description = "좌석 유형", example = "STANDARD")
-                String seatType, // TODO: Enum 처리
+                SeatType seatType,
 
-                @Schema(description = "이미 예약되어있는지 여부", example = "true")
-                boolean isReserved
-        ) {
-        }
+                @Schema(description = "좌석 가격", example = "800000")
+                long price
+        ) {}
 }

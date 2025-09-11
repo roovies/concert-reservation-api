@@ -2,8 +2,8 @@ package com.roovies.concertreservation.concerts.infra.adapter.out.persistence;
 
 import com.roovies.concertreservation.concerts.application.port.out.ConcertRepositoryPort;
 import com.roovies.concertreservation.concerts.domain.entity.Concert;
+import com.roovies.concertreservation.concerts.domain.entity.ConcertSchedule;
 import com.roovies.concertreservation.concerts.infra.adapter.out.persistence.entity.ConcertJpaEntity;
-import com.roovies.concertreservation.concerts.infra.adapter.out.persistence.entity.ConcertScheduleJpaEntity;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Repository;
 
@@ -39,12 +39,36 @@ public class ConcertRepositoryAdapter implements ConcertRepositoryPort {
     }
 
     @Override
+    // TODO: CQRS 패턴을 적용하여 Read Model 만들어서 서로 다른 BC간의 데이터 조회하기
     public Optional<Concert> findByIdWithSchedules(Long id) {
-        Optional<ConcertJpaEntity> entity = concertJpaRepository.findById(id);
+        Optional<ConcertJpaEntity> entity = concertJpaRepository.findByIdWithSchedules(id);
         if (entity.isPresent()) {
             ConcertJpaEntity concert = entity.get();
-            List<ConcertScheduleJpaEntity> schedules = concertScheduleJpaRepository.findByConcertId(concert.getId());
-            concert.setSchedules(schedules);
+
+            List<ConcertSchedule> schedules = concert.getSchedules().stream()
+                    .map(scheduleEntity -> ConcertSchedule.create(
+                            scheduleEntity.getId(),
+                            scheduleEntity.getConcert().getId(),
+                            scheduleEntity.getScheduleDate(),
+                            scheduleEntity.getAvailableSeats(), // 총 좌석수는 임시로 설정 -> Application에서 orchestration을 통해 적재
+                            scheduleEntity.getAvailableSeats(),
+                            scheduleEntity.getReservationStatus(),
+                            scheduleEntity.getConcertHall().getId()
+                    ))
+                    .toList();
+
+            Concert domainConcert = Concert.create(
+                    concert.getId(),
+                    concert.getTitle(),
+                    concert.getDescription(),
+                    concert.getMinPrice(),
+                    concert.getStartDate(),
+                    concert.getEndDate(),
+                    concert.getCreatedAt(),
+                    concert.getUpdatedAt()
+            );
+            domainConcert.setSchedules(schedules);
+            return Optional.of(domainConcert);
         }
         return Optional.empty();
     }

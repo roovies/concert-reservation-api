@@ -1,0 +1,258 @@
+package com.roovies.concertreservation.reservations.application;
+
+import com.roovies.concertreservation.concerthalls.domain.enums.SeatType;
+import com.roovies.concertreservation.concerts.domain.enums.ReservationStatus;
+import com.roovies.concertreservation.reservations.application.dto.query.GetAvailableSeatsQuery;
+import com.roovies.concertreservation.reservations.application.dto.result.GetAvailableSeatsResult;
+import com.roovies.concertreservation.reservations.application.port.out.ConcertHallQueryPort;
+import com.roovies.concertreservation.reservations.application.port.out.ConcertQueryPort;
+import com.roovies.concertreservation.reservations.application.port.out.ReservationRepositoryPort;
+import com.roovies.concertreservation.reservations.application.service.GetAvailableSeatsService;
+import com.roovies.concertreservation.reservations.domain.entity.Reservation;
+import com.roovies.concertreservation.reservations.domain.entity.ReservationDetail;
+import com.roovies.concertreservation.reservations.domain.enums.PaymentStatus;
+import com.roovies.concertreservation.reservations.domain.vo.external.ConcertHallInfo;
+import com.roovies.concertreservation.reservations.domain.vo.external.ConcertScheduleInfo;
+import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.ExtendWith;
+import org.mockito.InjectMocks;
+import org.mockito.Mock;
+import org.mockito.junit.jupiter.MockitoExtension;
+
+import java.time.LocalDate;
+import java.time.LocalDateTime;
+import java.util.Collections;
+import java.util.List;
+import java.util.NoSuchElementException;
+
+import static org.assertj.core.api.Assertions.*;
+import static org.mockito.BDDMockito.*;
+
+@ExtendWith(MockitoExtension.class)
+public class GetAvailableSeatsUseCaseTest {
+
+    @Mock
+    private ReservationRepositoryPort reservationRepositoryPort;
+
+    @Mock
+    private ConcertQueryPort concertQueryPort;
+
+    @Mock
+    private ConcertHallQueryPort concertHallQueryPort;
+
+    @InjectMocks
+    private GetAvailableSeatsService getAvailableSeatsService;
+
+    @Test
+    void 콘서트나_일정이_유효하지_않으면_예외가_발생해야_한다() {
+        // given
+        GetAvailableSeatsQuery query = GetAvailableSeatsQuery.builder()
+                .concertId(1L)
+                .date(LocalDate.of(2025, 9, 10))
+                .build();
+
+        given(concertQueryPort.getConcertScheduleInfo(query.concertId(), query.date()))
+                .willThrow(NoSuchElementException.class);
+
+        // when & then
+        assertThatThrownBy(() -> getAvailableSeatsService.execute(query))
+                .isInstanceOf(NoSuchElementException.class);
+    }
+
+    @Test
+    void 조회한_콘서트_일정의_잔여좌석이_0일_경우_좌석정보없이_매진_상태로_응답해야_한다() {
+        // given
+        LocalDate date = LocalDate.of(2025, 9, 10);
+        GetAvailableSeatsQuery query = GetAvailableSeatsQuery.builder()
+                .concertId(1L)
+                .date(date)
+                .build();
+
+        ConcertScheduleInfo schedule = ConcertScheduleInfo.builder()
+                .id(5L)
+                .date(date)
+                .availableSeats(0)
+                .status(ReservationStatus.AVAILABLE)
+                .concertHallId(10L)
+                .build();
+        given(concertQueryPort.getConcertScheduleInfo(query.concertId(), query.date()))
+                .willReturn(schedule);
+
+        // when
+        GetAvailableSeatsResult result = getAvailableSeatsService.execute(query);
+
+        // then
+        assertThat(result).isNotNull();
+        assertThat(result.concertId()).isEqualTo(query.concertId());
+        assertThat(result.date()).isEqualTo(query.date());
+        assertThat(result.availableSeats()).isEmpty();
+        assertThat(result.isAllReserved()).isTrue();
+    }
+
+    @Test
+    // 잔여 좌석이 남았더라도, 주최측 사정으로 매진시킬 수도 있는 상황을 고려하였음 (코로나 거리두기로 좌석 띄어앉기 등)
+    void 조회한_콘서트_일정의_예약상태가_SOLDOUT일_경우_좌석정보없이_매진_상태로_응답해야_한다() {
+        // given
+        LocalDate date = LocalDate.of(2025, 9, 10);
+        GetAvailableSeatsQuery query = GetAvailableSeatsQuery.builder()
+                .concertId(1L)
+                .date(date)
+                .build();
+
+        ConcertScheduleInfo schedule = ConcertScheduleInfo.builder()
+                .id(5L)
+                .date(date)
+                .availableSeats(50)
+                .status(ReservationStatus.SOLD_OUT)
+                .concertHallId(10L)
+                .build();
+        given(concertQueryPort.getConcertScheduleInfo(query.concertId(), query.date()))
+                .willReturn(schedule);
+
+        // when
+        GetAvailableSeatsResult result = getAvailableSeatsService.execute(query);
+
+        // then
+        assertThat(result).isNotNull();
+        assertThat(result.concertId()).isEqualTo(query.concertId());
+        assertThat(result.date()).isEqualTo(query.date());
+        assertThat(result.availableSeats()).isEmpty();
+        assertThat(result.isAllReserved()).isTrue();
+    }
+
+    @Test
+    void 예약된_좌석이_없을_경우_모든_좌석이_예약_가능해야_한다() {
+        // given
+        LocalDate date = LocalDate.of(2025, 9, 10);
+        GetAvailableSeatsQuery query = GetAvailableSeatsQuery.builder()
+                .concertId(1L)
+                .date(date)
+                .build();
+
+        ConcertScheduleInfo schedule = ConcertScheduleInfo.builder()
+                .id(5L)
+                .date(date)
+                .availableSeats(3)
+                .status(ReservationStatus.AVAILABLE)
+                .concertHallId(10L)
+                .build();
+        given(concertQueryPort.getConcertScheduleInfo(query.concertId(), query.date()))
+                .willReturn(schedule);
+
+        ConcertHallInfo hall = ConcertHallInfo.builder()
+                .id(10L)
+                .name("인천 아시아드 주경기장")
+                .totalSeats(3)
+                .seats(List.of(
+                        ConcertHallInfo.ConcertHallSeatInfo.builder()
+                                .id(1L)
+                                .row(1)
+                                .seatNumber(1)
+                                .seatType(SeatType.STANDARD)
+                                .build(),
+                        ConcertHallInfo.ConcertHallSeatInfo.builder()
+                                .id(1L)
+                                .row(1)
+                                .seatNumber(2)
+                                .seatType(SeatType.STANDARD)
+                                .build(),
+                        ConcertHallInfo.ConcertHallSeatInfo.builder()
+                                .id(1L)
+                                .row(1)
+                                .seatNumber(3)
+                                .seatType(SeatType.STANDARD)
+                                .build()
+                ))
+                .build();
+        given(concertHallQueryPort.getConcertHallInfo(schedule.concertHallId()))
+                .willReturn(hall);
+
+        given(reservationRepositoryPort.findReservationsByDetailScheduleId(schedule.id()))
+                .willReturn(Collections.emptyList());
+
+        // when
+        GetAvailableSeatsResult result = getAvailableSeatsService.execute(query);
+
+        // then
+        assertThat(result).isNotNull();
+        assertThat(result.concertId()).isEqualTo(query.concertId());
+        assertThat(result.date()).isEqualTo(query.date());
+        assertThat(result.availableSeats()).hasSize(3);
+        assertThat(result.isAllReserved()).isFalse();
+    }
+
+
+    @Test
+    void 일부_좌석이_예약된_경우_예약되지_않은_좌석만_조회되어야_한다() {
+        // given
+        LocalDate date = LocalDate.of(2025, 9, 10);
+        GetAvailableSeatsQuery query = GetAvailableSeatsQuery.builder()
+                .concertId(1L)
+                .date(date)
+                .build();
+        ConcertScheduleInfo schedule = ConcertScheduleInfo.builder()
+                .id(5L)
+                .date(date)
+                .availableSeats(3)
+                .status(ReservationStatus.AVAILABLE)
+                .concertHallId(10L)
+                .build();
+        given(concertQueryPort.getConcertScheduleInfo(query.concertId(), query.date()))
+                .willReturn(schedule);
+        ConcertHallInfo hall = ConcertHallInfo.builder()
+                .id(10L)
+                .name("인천 아시아드 주경기장")
+                .totalSeats(3)
+                .seats(List.of(
+                        ConcertHallInfo.ConcertHallSeatInfo.builder()
+                                .id(1L)
+                                .row(1)
+                                .seatNumber(1)
+                                .seatType(SeatType.STANDARD)
+                                .build(),
+                        ConcertHallInfo.ConcertHallSeatInfo.builder()
+                                .id(2L)
+                                .row(1)
+                                .seatNumber(2)
+                                .seatType(SeatType.STANDARD)
+                                .build(),
+                        ConcertHallInfo.ConcertHallSeatInfo.builder()
+                                .id(3L)
+                                .row(1)
+                                .seatNumber(3)
+                                .seatType(SeatType.STANDARD)
+                                .build()
+                ))
+                .build();
+        given(concertHallQueryPort.getConcertHallInfo(schedule.concertHallId()))
+                .willReturn(hall);
+
+        // 좌석 1이 예약된 상황
+        List<ReservationDetail> reservationDetails = List.of(
+                ReservationDetail.create(1L, 100L, 5L, 1L)
+        );
+        List<Reservation> reservations = List.of(
+                Reservation.create(100L, 1000L, PaymentStatus.CONFIRMED,
+                        LocalDateTime.now(), LocalDateTime.now(), reservationDetails)
+        );
+        given(reservationRepositoryPort.findReservationsByDetailScheduleId(schedule.id()))
+                .willReturn(reservations);
+
+        // when
+        GetAvailableSeatsResult result = getAvailableSeatsService.execute(query);
+
+        // then
+        assertThat(result).isNotNull();
+        assertThat(result.concertId()).isEqualTo(query.concertId());
+        assertThat(result.date()).isEqualTo(query.date());
+        assertThat(result.availableSeats()).hasSize(2);
+        assertThat(result.isAllReserved()).isFalse();
+
+        // 예약되지 않은 좌석만 포함되어야 함 (좌석 2, 3)
+        List<Long> availableSeatIds = result.availableSeats().stream()
+                .map(seat -> seat.seatId())
+                .toList();
+        assertThat(availableSeatIds).containsExactlyInAnyOrder(2L, 3L);
+        assertThat(availableSeatIds).doesNotContain(1L);
+    }
+}
