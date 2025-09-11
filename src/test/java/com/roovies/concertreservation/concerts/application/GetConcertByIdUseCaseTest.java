@@ -1,13 +1,13 @@
 package com.roovies.concertreservation.concerts.application;
 
-import com.roovies.concertreservation.concerts.application.dto.result.GetConcertResult;
+import com.roovies.concertreservation.concerts.application.dto.result.GetConcertByIdResult;
 import com.roovies.concertreservation.concerts.application.port.out.ConcertHallQueryPort;
 import com.roovies.concertreservation.concerts.application.service.GetConcertByIdService;
 import com.roovies.concertreservation.concerts.application.port.out.ConcertRepositoryPort;
 import com.roovies.concertreservation.concerts.domain.entity.Concert;
 import com.roovies.concertreservation.concerts.domain.entity.ConcertSchedule;
 import com.roovies.concertreservation.concerts.domain.enums.ReservationStatus;
-import com.roovies.concertreservation.concerts.domain.vo.external.ConcertHallInfo;
+import com.roovies.concertreservation.concerts.domain.vo.external.ConcertHallSnapShot;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.junit.jupiter.params.ParameterizedTest;
@@ -108,7 +108,7 @@ public class GetConcertByIdUseCaseTest {
                 .willReturn(Optional.of(concert));
 
         // 공연장 정보 Mocking
-        ConcertHallInfo concertHallInfo = ConcertHallInfo.builder()
+        ConcertHallSnapShot concertHallSnapShot = ConcertHallSnapShot.builder()
                 .id(5L)
                 .name("인천 아시아드 주경기장")
                 .totalSeats(1000)
@@ -116,11 +116,11 @@ public class GetConcertByIdUseCaseTest {
 
         Long concertHallId = concert.getSchedule(concert.getStartDate()).getConcertHallId();
 
-        given(concertHallQueryPort.getConcertHallInfo(concertHallId))
-                .willReturn(concertHallInfo);
+        given(concertHallQueryPort.findConcertHallById(concertHallId))
+                .willReturn(concertHallSnapShot);
 
         // when
-        GetConcertResult result = getConcertService.execute(1L);
+        GetConcertByIdResult result = getConcertService.execute(1L);
 
         // then
         assertThat(result).isNotNull();

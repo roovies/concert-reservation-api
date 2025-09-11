@@ -6,7 +6,7 @@ import lombok.Builder;
 import java.time.LocalDate;
 
 @Builder
-public record ConcertScheduleInfo(
+public record ConcertScheduleSnapShot(
         Long id,
         LocalDate date,
         int availableSeats,

@@ -2,7 +2,7 @@ package com.roovies.concertreservation.concerts.infra.adapter.in.web.controller;
 
 import com.roovies.concertreservation.concerts.application.port.in.GetConcertByIdUseCase;
 import com.roovies.concertreservation.concerts.infra.adapter.in.web.dto.request.GetConcertsRequest;
-import com.roovies.concertreservation.concerts.application.dto.result.GetConcertResult;
+import com.roovies.concertreservation.concerts.application.dto.result.GetConcertByIdResult;
 import com.roovies.concertreservation.concerts.application.dto.result.GetConcertsResult;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.media.Content;
@@ -17,7 +17,6 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import java.time.LocalDate;
-import java.time.LocalDateTime;
 import java.util.List;
 
 @RestController
@@ -37,7 +36,7 @@ public class ConcertController {
                     @ApiResponse(
                             responseCode = "200",
                             description = "콘서트 상세 정보 조회 성공",
-                            content = @Content(schema = @Schema(implementation = GetConcertResult.class))
+                            content = @Content(schema = @Schema(implementation = GetConcertByIdResult.class))
                     ),
                     @ApiResponse(
                             responseCode = "400",
@@ -54,8 +53,8 @@ public class ConcertController {
             }
     )
     @GetMapping("/{concertId}")
-    public ResponseEntity<GetConcertResult> getConcert(@PathVariable Long concertId) {
-        GetConcertResult concert = getConcertByIdUseCase.execute(concertId);
+    public ResponseEntity<GetConcertByIdResult> getConcert(@PathVariable Long concertId) {
+        GetConcertByIdResult concert = getConcertByIdUseCase.execute(concertId);
         return ResponseEntity.status(HttpStatus.OK).body(concert);
     }
 
@@ -86,22 +85,22 @@ public class ConcertController {
     )
     @GetMapping
     public ResponseEntity<GetConcertsResult> getConcerts(@Valid @RequestBody GetConcertsRequest request) {
-        List<GetConcertsResult.ConcertItem> dummyItems = List.of(
-                GetConcertsResult.ConcertItem.builder()
+        List<GetConcertsResult.ConcertInfo> dummyItems = List.of(
+                GetConcertsResult.ConcertInfo.builder()
                         .id(101L)
                         .title("K-Pop Concert 2025")
                         .startDate(LocalDate.of(2025, 9, 1))
                         .endDate(LocalDate.of(2025, 9, 5))
                         .totalSeats(1000)
                         .build(),
-                GetConcertsResult.ConcertItem.builder()
+                GetConcertsResult.ConcertInfo.builder()
                         .id(102L)
                         .title("Jazz Night Live")
                         .startDate(LocalDate.of(2025, 9, 10))
                         .endDate(LocalDate.of(2025, 9, 12))
                         .totalSeats(800)
                         .build(),
-                GetConcertsResult.ConcertItem.builder()
+                GetConcertsResult.ConcertInfo.builder()
                         .id(103L)
                         .title("Rock Festival 2025")
                         .startDate(LocalDate.of(2025, 9, 15))

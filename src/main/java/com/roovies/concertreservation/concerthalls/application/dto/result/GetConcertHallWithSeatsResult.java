@@ -13,12 +13,12 @@ public record GetConcertHallWithSeatsResult(
         int totalSeats,
         LocalDateTime createdAt,
         LocalDateTime updatedAt,
-        List<SeatItem> seats
+        List<SeatInfo> seats
 
 
 ) {
     @Builder
-    public record SeatItem(
+    public record SeatInfo(
        Long id,
        int row,
        int seatNumber,

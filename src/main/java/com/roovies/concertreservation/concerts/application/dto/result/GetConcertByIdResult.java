@@ -9,7 +9,7 @@ import java.time.LocalDateTime;
 
 @Builder
 @Schema(description = "콘서트 상세 정보 응답 DTO")
-public record GetConcertResult(
+public record GetConcertByIdResult(
         @Schema(description = "콘서트 ID", example = "101")
         Long id,
 

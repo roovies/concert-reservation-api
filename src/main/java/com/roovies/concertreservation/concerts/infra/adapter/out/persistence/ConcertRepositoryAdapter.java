@@ -18,8 +18,8 @@ public class ConcertRepositoryAdapter implements ConcertRepositoryPort {
     private final ConcertScheduleJpaRepository concertScheduleJpaRepository;
 
     @Override
-    public Optional<Concert> findById(Long id) {
-        Optional<ConcertJpaEntity> entity = concertJpaRepository.findById(id);
+    public Optional<Concert> findById(Long concertId) {
+        Optional<ConcertJpaEntity> entity = concertJpaRepository.findById(concertId);
         if (entity.isPresent()) {
             ConcertJpaEntity concert = entity.get();
             return Optional.of(
@@ -40,8 +40,8 @@ public class ConcertRepositoryAdapter implements ConcertRepositoryPort {
 
     @Override
     // TODO: CQRS 패턴을 적용하여 Read Model 만들어서 서로 다른 BC간의 데이터 조회하기
-    public Optional<Concert> findByIdWithSchedules(Long id) {
-        Optional<ConcertJpaEntity> entity = concertJpaRepository.findByIdWithSchedules(id);
+    public Optional<Concert> findByIdWithSchedules(Long concertId) {
+        Optional<ConcertJpaEntity> entity = concertJpaRepository.findByIdWithSchedules(concertId);
         if (entity.isPresent()) {
             ConcertJpaEntity concert = entity.get();
 

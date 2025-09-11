@@ -6,6 +6,6 @@ import java.util.List;
 import java.util.Optional;
 
 public interface ReservationRepositoryPort {
-    Optional<Reservation> findById(Long id);
+    Optional<Reservation> findById(Long reservationId);
     List<Reservation> findReservationsByDetailScheduleId(Long scheduleId);
 }

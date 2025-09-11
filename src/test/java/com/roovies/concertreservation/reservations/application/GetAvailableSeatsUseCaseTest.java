@@ -11,8 +11,8 @@ import com.roovies.concertreservation.reservations.application.service.GetAvaila
 import com.roovies.concertreservation.reservations.domain.entity.Reservation;
 import com.roovies.concertreservation.reservations.domain.entity.ReservationDetail;
 import com.roovies.concertreservation.reservations.domain.enums.PaymentStatus;
-import com.roovies.concertreservation.reservations.domain.vo.external.ConcertHallInfo;
-import com.roovies.concertreservation.reservations.domain.vo.external.ConcertScheduleInfo;
+import com.roovies.concertreservation.reservations.domain.vo.external.ConcertHallSnapShot;
+import com.roovies.concertreservation.reservations.domain.vo.external.ConcertScheduleSnapShot;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
@@ -51,7 +51,7 @@ public class GetAvailableSeatsUseCaseTest {
                 .date(LocalDate.of(2025, 9, 10))
                 .build();
 
-        given(concertQueryPort.getConcertScheduleInfo(query.concertId(), query.date()))
+        given(concertQueryPort.findConcertSchedule(query.concertId(), query.date()))
                 .willThrow(NoSuchElementException.class);
 
         // when & then
@@ -68,14 +68,14 @@ public class GetAvailableSeatsUseCaseTest {
                 .date(date)
                 .build();
 
-        ConcertScheduleInfo schedule = ConcertScheduleInfo.builder()
+        ConcertScheduleSnapShot schedule = ConcertScheduleSnapShot.builder()
                 .id(5L)
                 .date(date)
                 .availableSeats(0)
                 .status(ReservationStatus.AVAILABLE)
                 .concertHallId(10L)
                 .build();
-        given(concertQueryPort.getConcertScheduleInfo(query.concertId(), query.date()))
+        given(concertQueryPort.findConcertSchedule(query.concertId(), query.date()))
                 .willReturn(schedule);
 
         // when
@@ -99,14 +99,14 @@ public class GetAvailableSeatsUseCaseTest {
                 .date(date)
                 .build();
 
-        ConcertScheduleInfo schedule = ConcertScheduleInfo.builder()
+        ConcertScheduleSnapShot schedule = ConcertScheduleSnapShot.builder()
                 .id(5L)
                 .date(date)
                 .availableSeats(50)
                 .status(ReservationStatus.SOLD_OUT)
                 .concertHallId(10L)
                 .build();
-        given(concertQueryPort.getConcertScheduleInfo(query.concertId(), query.date()))
+        given(concertQueryPort.findConcertSchedule(query.concertId(), query.date()))
                 .willReturn(schedule);
 
         // when
@@ -129,34 +129,34 @@ public class GetAvailableSeatsUseCaseTest {
                 .date(date)
                 .build();
 
-        ConcertScheduleInfo schedule = ConcertScheduleInfo.builder()
+        ConcertScheduleSnapShot schedule = ConcertScheduleSnapShot.builder()
                 .id(5L)
                 .date(date)
                 .availableSeats(3)
                 .status(ReservationStatus.AVAILABLE)
                 .concertHallId(10L)
                 .build();
-        given(concertQueryPort.getConcertScheduleInfo(query.concertId(), query.date()))
+        given(concertQueryPort.findConcertSchedule(query.concertId(), query.date()))
                 .willReturn(schedule);
 
-        ConcertHallInfo hall = ConcertHallInfo.builder()
+        ConcertHallSnapShot hall = ConcertHallSnapShot.builder()
                 .id(10L)
                 .name("인천 아시아드 주경기장")
                 .totalSeats(3)
                 .seats(List.of(
-                        ConcertHallInfo.ConcertHallSeatInfo.builder()
+                        ConcertHallSnapShot.ConcertHallSeatInfo.builder()
                                 .id(1L)
                                 .row(1)
                                 .seatNumber(1)
                                 .seatType(SeatType.STANDARD)
                                 .build(),
-                        ConcertHallInfo.ConcertHallSeatInfo.builder()
+                        ConcertHallSnapShot.ConcertHallSeatInfo.builder()
                                 .id(1L)
                                 .row(1)
                                 .seatNumber(2)
                                 .seatType(SeatType.STANDARD)
                                 .build(),
-                        ConcertHallInfo.ConcertHallSeatInfo.builder()
+                        ConcertHallSnapShot.ConcertHallSeatInfo.builder()
                                 .id(1L)
                                 .row(1)
                                 .seatNumber(3)
@@ -164,7 +164,7 @@ public class GetAvailableSeatsUseCaseTest {
                                 .build()
                 ))
                 .build();
-        given(concertHallQueryPort.getConcertHallInfo(schedule.concertHallId()))
+        given(concertHallQueryPort.findConcertHallById(schedule.concertHallId()))
                 .willReturn(hall);
 
         given(reservationRepositoryPort.findReservationsByDetailScheduleId(schedule.id()))
@@ -190,33 +190,33 @@ public class GetAvailableSeatsUseCaseTest {
                 .concertId(1L)
                 .date(date)
                 .build();
-        ConcertScheduleInfo schedule = ConcertScheduleInfo.builder()
+        ConcertScheduleSnapShot schedule = ConcertScheduleSnapShot.builder()
                 .id(5L)
                 .date(date)
                 .availableSeats(3)
                 .status(ReservationStatus.AVAILABLE)
                 .concertHallId(10L)
                 .build();
-        given(concertQueryPort.getConcertScheduleInfo(query.concertId(), query.date()))
+        given(concertQueryPort.findConcertSchedule(query.concertId(), query.date()))
                 .willReturn(schedule);
-        ConcertHallInfo hall = ConcertHallInfo.builder()
+        ConcertHallSnapShot hall = ConcertHallSnapShot.builder()
                 .id(10L)
                 .name("인천 아시아드 주경기장")
                 .totalSeats(3)
                 .seats(List.of(
-                        ConcertHallInfo.ConcertHallSeatInfo.builder()
+                        ConcertHallSnapShot.ConcertHallSeatInfo.builder()
                                 .id(1L)
                                 .row(1)
                                 .seatNumber(1)
                                 .seatType(SeatType.STANDARD)
                                 .build(),
-                        ConcertHallInfo.ConcertHallSeatInfo.builder()
+                        ConcertHallSnapShot.ConcertHallSeatInfo.builder()
                                 .id(2L)
                                 .row(1)
                                 .seatNumber(2)
                                 .seatType(SeatType.STANDARD)
                                 .build(),
-                        ConcertHallInfo.ConcertHallSeatInfo.builder()
+                        ConcertHallSnapShot.ConcertHallSeatInfo.builder()
                                 .id(3L)
                                 .row(1)
                                 .seatNumber(3)
@@ -224,7 +224,7 @@ public class GetAvailableSeatsUseCaseTest {
                                 .build()
                 ))
                 .build();
-        given(concertHallQueryPort.getConcertHallInfo(schedule.concertHallId()))
+        given(concertHallQueryPort.findConcertHallById(schedule.concertHallId()))
                 .willReturn(hall);
 
         // 좌석 1이 예약된 상황

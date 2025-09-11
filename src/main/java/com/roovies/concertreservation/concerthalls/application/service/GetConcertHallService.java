@@ -17,8 +17,8 @@ public class GetConcertHallService implements GetConcertHallUseCase {
 
 
     @Override
-    public GetConcertHallResult execute(Long id) {
-        ConcertHall concertHall = concertHallRepositoryPort.findById(id)
+    public GetConcertHallResult execute(Long concertHallId) {
+        ConcertHall concertHall = concertHallRepositoryPort.findById(concertHallId)
                 .orElseThrow(() -> new NoSuchElementException("공연장을 찾을 수 없습니다."));
         return GetConcertHallResult.builder()
                 .id(concertHall.getId())

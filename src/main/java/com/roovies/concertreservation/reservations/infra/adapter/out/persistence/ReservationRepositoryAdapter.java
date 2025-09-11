@@ -20,8 +20,8 @@ public class ReservationRepositoryAdapter implements ReservationRepositoryPort {
     private final ReservationDetailJpaRepository reservationDetailJpaRepository;
 
     @Override
-    public Optional<Reservation> findById(Long id) {
-        Optional<ReservationJpaEntity> entity = reservationJpaRepository.findById(id);
+    public Optional<Reservation> findById(Long reservationId) {
+        Optional<ReservationJpaEntity> entity = reservationJpaRepository.findById(reservationId);
         if (entity.isPresent()) {
             ReservationJpaEntity reservation = entity.get();
             return Optional.of(

@@ -6,7 +6,7 @@ import lombok.Builder;
 import java.util.List;
 
 @Builder
-public record ConcertHallInfo(
+public record ConcertHallSnapShot(
         Long id,
         String name,
         int totalSeats,

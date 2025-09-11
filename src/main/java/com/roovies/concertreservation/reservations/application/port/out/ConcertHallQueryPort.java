@@ -1,7 +1,7 @@
 package com.roovies.concertreservation.reservations.application.port.out;
 
-import com.roovies.concertreservation.reservations.domain.vo.external.ConcertHallInfo;
+import com.roovies.concertreservation.reservations.domain.vo.external.ConcertHallSnapShot;
 
 public interface ConcertHallQueryPort {
-    ConcertHallInfo getConcertHallInfo(Long concertHallId);
+    ConcertHallSnapShot findConcertHallById(Long concertHallId);
 }

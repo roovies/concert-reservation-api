@@ -10,6 +10,6 @@ import java.util.Optional;
 public interface ConcertJpaRepository extends JpaRepository<ConcertJpaEntity, Long> {
     @Query("SELECT c FROM ConcertJpaEntity c " +
             "LEFT JOIN FETCH c.schedules s " +
-            "WHERE c.id = :id")
-    Optional<ConcertJpaEntity> findByIdWithSchedules(@Param("id") Long id);
+            "WHERE c.id = :concertId")
+    Optional<ConcertJpaEntity> findByIdWithSchedules(@Param("concertId") Long concertId);
 }

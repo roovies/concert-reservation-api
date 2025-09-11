@@ -10,7 +10,7 @@ import java.util.List;
 @Schema(description = "콘서트 목록 조회 응답 DTO")
 public record GetConcertsResult(
         @Schema(description = "내역 리스트")
-        List<ConcertItem> items,
+        List<ConcertInfo> items,
 
         @Schema(description = "현재 페이지 번호")
         int page,
@@ -26,7 +26,7 @@ public record GetConcertsResult(
 ) {
         @Builder
         @Schema(description = "콘서트 아이템 DTO")
-        public record ConcertItem(
+        public record ConcertInfo(
                 @Schema(description = "콘서트 ID", example = "101")
                 Long id,
 

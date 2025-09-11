@@ -21,8 +21,8 @@ public class GetConcertHallWithSeatsService implements GetConcertHallWithSeatsUs
         ConcertHall concertHall = concertHallRepositoryPort.findByIdWithSeats(concertHallId)
                 .orElseThrow(() -> new NoSuchElementException("공연장을 찾을 수 없습니다."));
 
-        List <GetConcertHallWithSeatsResult.SeatItem> seats = concertHall.getSeats().stream()
-                .map(seat -> GetConcertHallWithSeatsResult.SeatItem.builder()
+        List <GetConcertHallWithSeatsResult.SeatInfo> seats = concertHall.getSeats().stream()
+                .map(seat -> GetConcertHallWithSeatsResult.SeatInfo.builder()
                         .id(seat.getId())
                         .row(seat.getRow())
                         .seatNumber(seat.getSeatNumber())
