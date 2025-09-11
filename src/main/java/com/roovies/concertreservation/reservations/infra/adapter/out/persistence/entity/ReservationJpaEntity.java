@@ -1,6 +1,7 @@
 package com.roovies.concertreservation.reservations.infra.adapter.out.persistence.entity;
 
-import com.roovies.concertreservation.concerts.domain.enums.ReservationStatus;
+import com.roovies.concertreservation.reservations.domain.enums.PaymentStatus;
+import com.roovies.concertreservation.users.infra.adapter.out.persistence.entity.UserJpaEntity;
 import jakarta.persistence.*;
 import lombok.Getter;
 
@@ -16,13 +17,13 @@ public class ReservationJpaEntity {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
-    // 회원 ID (FK)
-    @Column(name = "user_id", nullable = false)
-    private Long userId;
+    @ManyToOne(fetch = FetchType.LAZY, optional = false)
+    @JoinColumn(name = "user_id", nullable = false)
+    private UserJpaEntity user; // 예약자 (FK)
 
     @Enumerated(EnumType.STRING)
     @Column(name = "status", nullable = false, length = 20)
-    private ReservationStatus status;  // HOLD/CONFIRMED/CANCELLED/REFUNDED
+    private PaymentStatus status;  // HOLD/CONFIRMED/CANCELLED/REFUNDED
 
 
     @Column(name = "created_at", nullable = false, updatable = false)
