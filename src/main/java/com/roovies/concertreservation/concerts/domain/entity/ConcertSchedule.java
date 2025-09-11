@@ -8,6 +8,7 @@ import java.time.LocalDate;
 @Getter
 public class ConcertSchedule {
     private final Long id;
+    private final Long concertId;
     private final LocalDate date;
     private final int totalSeats;
     private int availableSeats;
@@ -17,15 +18,17 @@ public class ConcertSchedule {
     private final Long concertHallId;
 
     public static ConcertSchedule create(
-            Long id, LocalDate scheduleDate,
+            Long id, Long concertId,
+            LocalDate scheduleDate,
             int totalSeats, int availableSeats,
             ReservationStatus reservationStatus, Long concertHallId
     ) {
-        return new ConcertSchedule(id, scheduleDate, totalSeats, availableSeats, reservationStatus, concertHallId);
+        return new ConcertSchedule(id, concertId, scheduleDate, totalSeats, availableSeats, reservationStatus, concertHallId);
     }
 
     private ConcertSchedule(
-            Long id, LocalDate date,
+            Long id, Long concertId,
+            LocalDate date,
             int totalSeats, int availableSeats,
             ReservationStatus reservationStatus, Long concertHallId
     ) {
@@ -34,6 +37,7 @@ public class ConcertSchedule {
             throw new IllegalArgumentException("예약 가능한 좌석의 수는 전체 좌석 수보다 많을 수 없습니다.");
 
         this.id = id;
+        this.concertId = concertId;
         this.date = date;
         this.totalSeats = totalSeats;
         this.availableSeats = availableSeats;

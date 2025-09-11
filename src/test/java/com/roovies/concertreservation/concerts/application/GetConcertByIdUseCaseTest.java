@@ -98,9 +98,9 @@ public class GetConcertByIdUseCaseTest {
         );
 
         List<ConcertSchedule> schedules = new ArrayList<>(Arrays.asList(
-                ConcertSchedule.create(1L, LocalDate.of(2025, 9, 1), 100, 100, ReservationStatus.AVAILABLE, 5L),
-                ConcertSchedule.create(1L, LocalDate.of(2025, 9, 2), 100, 100, ReservationStatus.AVAILABLE, 5L),
-                ConcertSchedule.create(1L, LocalDate.of(2025, 9, 3), 100, 100, ReservationStatus.AVAILABLE, 5L)
+                ConcertSchedule.create(1L, 1L, LocalDate.of(2025, 9, 1), 100, 100, ReservationStatus.AVAILABLE, 5L),
+                ConcertSchedule.create(1L, 1L, LocalDate.of(2025, 9, 2), 100, 100, ReservationStatus.AVAILABLE, 5L),
+                ConcertSchedule.create(1L, 1L, LocalDate.of(2025, 9, 3), 100, 100, ReservationStatus.AVAILABLE, 5L)
         ));
         concert.setSchedules(schedules);
 

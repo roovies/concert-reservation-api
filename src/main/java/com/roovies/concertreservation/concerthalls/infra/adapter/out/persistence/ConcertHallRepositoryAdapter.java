@@ -7,6 +7,7 @@ import com.roovies.concertreservation.concerthalls.domain.vo.Money;
 import com.roovies.concertreservation.concerthalls.infra.adapter.out.persistence.entity.ConcertHallJpaEntity;
 import com.roovies.concertreservation.concerthalls.infra.adapter.out.persistence.entity.ConcertHallSeatJpaEntity;
 import lombok.RequiredArgsConstructor;
+import org.springframework.data.repository.query.Param;
 import org.springframework.stereotype.Repository;
 
 import java.util.List;
@@ -22,7 +23,7 @@ public class ConcertHallRepositoryAdapter implements ConcertHallRepositoryPort {
     public Optional<ConcertHall> findById(Long id) {
         Optional<ConcertHallJpaEntity> entity = concertHallJpaRepository.findById(id);
         if (entity.isPresent()) {
-            ConcertHallJpaEntity concertHall = new ConcertHallJpaEntity();
+            ConcertHallJpaEntity concertHall = entity.get();
             return Optional.of(
                     ConcertHall.create(
                             concertHall.getId(),
@@ -37,23 +38,31 @@ public class ConcertHallRepositoryAdapter implements ConcertHallRepositoryPort {
     }
 
     @Override
-    public Optional<ConcertHall> findByIdWithSeats(Long concertHallId) {
-        Optional<ConcertHall> concertHall = findById(concertHallId);
-        if (concertHall.isPresent()) {
-            List<ConcertHallSeatJpaEntity> seatEntities = concertHallSeatJpaRepository.findByConcertHallId(concertHallId);
-            List<ConcertHallSeat> seats = seatEntities.stream()
-                    .map(entity -> ConcertHallSeat.create(
-                            entity.getId(),
-                            entity.getRow(),
-                            entity.getSeatNumber(),
-                            entity.getType(),
-                            new Money(entity.getPrice()),
-                            entity.getCreatedAt()
+    public Optional<ConcertHall> findByIdWithSeats(@Param("id") Long concertHallId) {
+        Optional<ConcertHallJpaEntity> entity = concertHallJpaRepository.findByIdWithSeats(concertHallId);
+        if (entity.isPresent()) {
+            ConcertHallJpaEntity concertHall = entity.get();
+
+            List<ConcertHallSeat> seats = concertHall.getSeats().stream()
+                    .map(seatEntity -> ConcertHallSeat.create(
+                            seatEntity.getId(),
+                            seatEntity.getRow(),
+                            seatEntity.getSeatNumber(),
+                            seatEntity.getType(),
+                            new Money(seatEntity.getPrice()),
+                            seatEntity.getCreatedAt()
                     ))
                     .toList();
 
-            concertHall.get().setSeats(seats);
-            return concertHall;
+            ConcertHall domainConcertHall = ConcertHall.create(
+                    concertHall.getId(),
+                    concertHall.getName(),
+                    concertHall.getTotalSeats(),
+                    concertHall.getCreatedAt(),
+                    concertHall.getUpdatedAt()
+            );
+            domainConcertHall.setSeats(seats);
+            return Optional.of(domainConcertHall);
         }
         return Optional.empty();
     }

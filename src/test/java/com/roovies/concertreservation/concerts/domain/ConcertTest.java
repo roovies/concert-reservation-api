@@ -87,9 +87,9 @@ public class ConcertTest {
 
         // 상세 일정 목록 설정
         List<ConcertSchedule> schedules = List.of(
-                ConcertSchedule.create(1L, LocalDate.of(2025, 9, 1), 100, 100, ReservationStatus.AVAILABLE, 5L),
-                ConcertSchedule.create(1L, LocalDate.of(2025, 9, 2), 100, 100, ReservationStatus.AVAILABLE, 5L),
-                ConcertSchedule.create(1L, LocalDate.of(2025, 9, 3), 100, 100, ReservationStatus.AVAILABLE, 5L)
+                ConcertSchedule.create(1L, 1L, LocalDate.of(2025, 9, 1), 100, 100, ReservationStatus.AVAILABLE, 5L),
+                ConcertSchedule.create(1L, 1L, LocalDate.of(2025, 9, 2), 100, 100, ReservationStatus.AVAILABLE, 5L),
+                ConcertSchedule.create(1L, 1L, LocalDate.of(2025, 9, 3), 100, 100, ReservationStatus.AVAILABLE, 5L)
         );
 
         // when
@@ -122,9 +122,9 @@ public class ConcertTest {
 
         // 상세 일정 목록 설정
         List<ConcertSchedule> invalidSchedules = List.of(
-                ConcertSchedule.create(1L, LocalDate.of(2025, 8, 31), 100, 100, ReservationStatus.AVAILABLE, 5L),
-                ConcertSchedule.create(1L, LocalDate.of(2025, 9, 2), 100, 100, ReservationStatus.AVAILABLE, 5L),
-                ConcertSchedule.create(1L, LocalDate.of(2025, 9, 3), 100, 100, ReservationStatus.AVAILABLE, 5L)
+                ConcertSchedule.create(1L, 1L, LocalDate.of(2025, 8, 31), 100, 100, ReservationStatus.AVAILABLE, 5L),
+                ConcertSchedule.create(1L, 1L, LocalDate.of(2025, 9, 2), 100, 100, ReservationStatus.AVAILABLE, 5L),
+                ConcertSchedule.create(1L, 1L, LocalDate.of(2025, 9, 3), 100, 100, ReservationStatus.AVAILABLE, 5L)
         );
 
         // when & then
@@ -147,16 +147,16 @@ public class ConcertTest {
 
         // 상세 일정 목록 설정
         List<ConcertSchedule> validSchedules = new ArrayList<>(Arrays.asList(
-                ConcertSchedule.create(1L, LocalDate.of(2025, 9, 1), 100, 100, ReservationStatus.AVAILABLE, 5L),
-                ConcertSchedule.create(1L, LocalDate.of(2025, 9, 2), 100, 100, ReservationStatus.AVAILABLE, 5L),
-                ConcertSchedule.create(1L, LocalDate.of(2025, 9, 3), 100, 100, ReservationStatus.AVAILABLE, 5L)
+                ConcertSchedule.create(1L, 1L, LocalDate.of(2025, 9, 1), 100, 100, ReservationStatus.AVAILABLE, 5L),
+                ConcertSchedule.create(1L, 1L, LocalDate.of(2025, 9, 2), 100, 100, ReservationStatus.AVAILABLE, 5L),
+                ConcertSchedule.create(1L, 1L, LocalDate.of(2025, 9, 3), 100, 100, ReservationStatus.AVAILABLE, 5L)
         ));
 
         concert.setSchedules(validSchedules);
         List<ConcertSchedule> schedules = concert.getSchedules();
 
         // when & then
-        assertThatThrownBy(() -> schedules.add(ConcertSchedule.create(1L, LocalDate.of(2025, 9, 4), 100, 100, ReservationStatus.AVAILABLE, 5L)))
+        assertThatThrownBy(() -> schedules.add(ConcertSchedule.create(1L, 1L, LocalDate.of(2025, 9, 4), 100, 100, ReservationStatus.AVAILABLE, 5L)))
                 .isInstanceOf(UnsupportedOperationException.class);
     }
 
@@ -170,7 +170,7 @@ public class ConcertTest {
                 LocalDateTime.of(2025, 9, 1, 0, 0),
                 null
         );
-        ConcertSchedule invalidConcerSchedule = ConcertSchedule.create(1L, LocalDate.of(2025, 8, 31), 100, 100, ReservationStatus.AVAILABLE, 5L); // 시작일 이전
+        ConcertSchedule invalidConcerSchedule = ConcertSchedule.create(1L, 1L, LocalDate.of(2025, 8, 31), 100, 100, ReservationStatus.AVAILABLE, 5L); // 시작일 이전
 
         // when & then
         assertThatThrownBy(() -> concert.addSchedule(invalidConcerSchedule))
@@ -190,14 +190,14 @@ public class ConcertTest {
                 null
         );
         List<ConcertSchedule> existedSchedules = new ArrayList<>(Arrays.asList(
-                ConcertSchedule.create(1L, LocalDate.of(2025, 9, 1), 100, 100, ReservationStatus.AVAILABLE, 5L),
-                ConcertSchedule.create(1L, LocalDate.of(2025, 9, 3), 100, 100, ReservationStatus.AVAILABLE, 5L),
-                ConcertSchedule.create(1L, LocalDate.of(2025, 9, 5), 100, 100, ReservationStatus.AVAILABLE, 5L)
+                ConcertSchedule.create(1L, 1L, LocalDate.of(2025, 9, 1), 100, 100, ReservationStatus.AVAILABLE, 5L),
+                ConcertSchedule.create(1L, 1L, LocalDate.of(2025, 9, 3), 100, 100, ReservationStatus.AVAILABLE, 5L),
+                ConcertSchedule.create(1L, 1L, LocalDate.of(2025, 9, 5), 100, 100, ReservationStatus.AVAILABLE, 5L)
         ));
         concert.setSchedules(existedSchedules);
 
         // 새 일정
-        ConcertSchedule newSchedule = ConcertSchedule.create(1L, LocalDate.of(2025, 9, 2), 100, 100, ReservationStatus.AVAILABLE, 5L);
+        ConcertSchedule newSchedule = ConcertSchedule.create(1L, 1L, LocalDate.of(2025, 9, 2), 100, 100, ReservationStatus.AVAILABLE, 5L);
 
         // when
         concert.addSchedule(newSchedule);
@@ -223,9 +223,9 @@ public class ConcertTest {
                 null
         );
         List<ConcertSchedule> existedSchedules = new ArrayList<>(Arrays.asList(
-                ConcertSchedule.create(1L, LocalDate.of(2025, 9, 1), 100, 100, ReservationStatus.AVAILABLE, 5L),
-                ConcertSchedule.create(1L, LocalDate.of(2025, 9, 2), 100, 100, ReservationStatus.AVAILABLE, 5L),
-                ConcertSchedule.create(1L, LocalDate.of(2025, 9, 3), 100, 100, ReservationStatus.AVAILABLE, 5L)
+                ConcertSchedule.create(1L, 1L, LocalDate.of(2025, 9, 1), 100, 100, ReservationStatus.AVAILABLE, 5L),
+                ConcertSchedule.create(1L, 1L, LocalDate.of(2025, 9, 2), 100, 100, ReservationStatus.AVAILABLE, 5L),
+                ConcertSchedule.create(1L, 1L, LocalDate.of(2025, 9, 3), 100, 100, ReservationStatus.AVAILABLE, 5L)
         ));
         concert.setSchedules(existedSchedules);
 
@@ -248,9 +248,9 @@ public class ConcertTest {
                 null
         );
         List<ConcertSchedule> existedSchedules = new ArrayList<>(Arrays.asList(
-                ConcertSchedule.create(1L, LocalDate.of(2025, 9, 1), 100, 100, ReservationStatus.AVAILABLE, 5L),
-                ConcertSchedule.create(1L, LocalDate.of(2025, 9, 2), 100, 100, ReservationStatus.AVAILABLE, 5L),
-                ConcertSchedule.create(1L, LocalDate.of(2025, 9, 3), 100, 100, ReservationStatus.AVAILABLE, 5L)
+                ConcertSchedule.create(1L, 1L, LocalDate.of(2025, 9, 1), 100, 100, ReservationStatus.AVAILABLE, 5L),
+                ConcertSchedule.create(1L, 1L, LocalDate.of(2025, 9, 2), 100, 100, ReservationStatus.AVAILABLE, 5L),
+                ConcertSchedule.create(1L, 1L, LocalDate.of(2025, 9, 3), 100, 100, ReservationStatus.AVAILABLE, 5L)
         ));
         concert.setSchedules(existedSchedules);
 
