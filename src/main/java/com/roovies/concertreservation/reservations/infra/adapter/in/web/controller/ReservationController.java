@@ -1,5 +1,8 @@
 package com.roovies.concertreservation.reservations.infra.adapter.in.web.controller;
 
+import com.roovies.concertreservation.reservations.application.dto.query.GetAvailableSeatsQuery;
+import com.roovies.concertreservation.reservations.application.dto.result.GetAvailableSeatsResult;
+import com.roovies.concertreservation.reservations.application.port.in.GetAvailableSeatsUseCase;
 import com.roovies.concertreservation.reservations.infra.adapter.in.web.dto.request.CreateReservationRequest;
 import com.roovies.concertreservation.reservations.infra.adapter.in.web.dto.request.GetReservationHistoryRequest;
 import com.roovies.concertreservation.reservations.infra.adapter.in.web.dto.response.CreateReservationResponse;
@@ -28,7 +31,6 @@ import org.springframework.web.bind.annotation.*;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.util.Arrays;
-import java.util.Collections;
 import java.util.List;
 
 @RestController
@@ -36,6 +38,8 @@ import java.util.List;
 @RequestMapping("/api/v1/reservations")
 @Tag(name = "Reservation API", description = "콘서트 예약 관련 명세서")
 public class ReservationController {
+
+    private final GetAvailableSeatsUseCase getAvailableSeatsUseCase;
 
     @Operation(
             summary = "콘서트 예약 가능 일정 목록 조회",
@@ -104,11 +108,29 @@ public class ReservationController {
             @PathVariable("concertId") final Long concertId,
             @PathVariable("date") @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) final LocalDate date
     ) {
+        GetAvailableSeatsQuery query = GetAvailableSeatsQuery.builder()
+                .concertId(concertId)
+                .date(date)
+                .build();
+
+        GetAvailableSeatsResult result = getAvailableSeatsUseCase.execute(query);
+        List<GetAvailableSeatsResponse.SeatItemDto> availableSeats = result.availableSeats().stream()
+                .map(seat -> GetAvailableSeatsResponse.SeatItemDto.builder()
+                        .seatId(seat.seatId())
+                        .row(seat.row())
+                        .seatNumber(seat.seatNumber())
+                        .seatType(seat.seatType())
+                        .price(seat.price())
+                        .build()
+                )
+                .toList();
+
         return ResponseEntity.status(HttpStatus.OK).body(
                 GetAvailableSeatsResponse.builder()
-                        .concertId(10L)
-                        .date(LocalDate.now())
-                        .seats(Collections.emptyList())
+                        .concertId(result.concertId())
+                        .date(result.date())
+                        .availableSeats(availableSeats)
+                        .isAllReserved(result.isAllReserved())
                         .build()
         );
     }
