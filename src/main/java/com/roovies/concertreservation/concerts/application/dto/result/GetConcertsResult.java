@@ -1,4 +1,4 @@
-package com.roovies.concertreservation.concerts.infra.adapter.in.web.dto.response;
+package com.roovies.concertreservation.concerts.application.dto.result;
 
 import io.swagger.v3.oas.annotations.media.Schema;
 import lombok.Builder;
@@ -8,7 +8,7 @@ import java.util.List;
 
 @Builder
 @Schema(description = "콘서트 목록 조회 응답 DTO")
-public record GetConcertsResponse(
+public record GetConcertsResult(
         @Schema(description = "내역 리스트")
         List<ConcertItem> items,
 
@@ -40,6 +40,6 @@ public record GetConcertsResponse(
                 LocalDate endDate,
 
                 @Schema(description = "총 좌석 수", example = "1000")
-                int totalSeats
+                int totalSeats // TODO: 총 좌석 수가 아니라 상태로 바꾸는 게 좋을 듯 => 시작일/종료일 관련된
         ) {}
 }
