@@ -16,7 +16,7 @@ public class ConcertHallQueryAdapter implements ConcertHallQueryPort {
     private final GetConcertHallWithSeatsUseCase getConcertHallWithSeatsUseCase;
 
     @Override
-    public ConcertHallSnapShot findConcertHallById(Long concertHallId) {
+    public ConcertHallSnapShot findConcertHallWithSeats(Long concertHallId) {
         GetConcertHallWithSeatsResult result = getConcertHallWithSeatsUseCase.execute(concertHallId);
         List<ConcertHallSnapShot.ConcertHallSeatInfo> seats = result.seats().stream()
                 .map(seat -> ConcertHallSnapShot.ConcertHallSeatInfo.builder()

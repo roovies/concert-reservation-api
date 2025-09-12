@@ -20,12 +20,6 @@ public class GetConcertHallService implements GetConcertHallUseCase {
     public GetConcertHallResult execute(Long concertHallId) {
         ConcertHall concertHall = concertHallRepositoryPort.findById(concertHallId)
                 .orElseThrow(() -> new NoSuchElementException("공연장을 찾을 수 없습니다."));
-        return GetConcertHallResult.builder()
-                .id(concertHall.getId())
-                .name(concertHall.getName())
-                .totalSeats(concertHall.getTotalSeats())
-                .createdAt(concertHall.getCreatedAt())
-                .updatedAt(concertHall.getUpdatedAt())
-                .build();
+        return GetConcertHallResult.from(concertHall);
     }
 }

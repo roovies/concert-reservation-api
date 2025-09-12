@@ -1,7 +1,7 @@
 package com.roovies.concertreservation.reservations.infra.adapter.in.web.controller;
 
 import com.roovies.concertreservation.reservations.application.dto.query.GetAvailableSeatsQuery;
-import com.roovies.concertreservation.reservations.application.dto.result.GetAvailableSeatsResult;
+import com.roovies.concertreservation.reservations.application.dto.result.GetAvailableSeatListResult;
 import com.roovies.concertreservation.reservations.application.port.in.GetAvailableSeatsUseCase;
 import com.roovies.concertreservation.reservations.infra.adapter.in.web.dto.request.CreateReservationRequest;
 import com.roovies.concertreservation.reservations.infra.adapter.in.web.dto.request.GetReservationHistoryRequest;
@@ -113,7 +113,7 @@ public class ReservationController {
                 .date(date)
                 .build();
 
-        GetAvailableSeatsResult result = getAvailableSeatsUseCase.execute(query);
+        GetAvailableSeatListResult result = getAvailableSeatsUseCase.execute(query);
         List<GetAvailableSeatsResponse.SeatItemDto> availableSeats = result.availableSeats().stream()
                 .map(seat -> GetAvailableSeatsResponse.SeatItemDto.builder()
                         .seatId(seat.seatId())

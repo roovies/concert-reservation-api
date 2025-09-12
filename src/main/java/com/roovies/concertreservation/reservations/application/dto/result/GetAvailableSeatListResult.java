@@ -7,7 +7,7 @@ import java.time.LocalDate;
 import java.util.List;
 
 @Builder
-public record GetAvailableSeatsResult(
+public record GetAvailableSeatListResult(
         Long concertId,
         LocalDate date,
         List<SeatInfo> availableSeats,

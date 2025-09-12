@@ -1,14 +1,17 @@
 package com.roovies.concertreservation.concerthalls.infra.adapter.out.persistence.entity;
 
 import jakarta.persistence.*;
+import lombok.AccessLevel;
 import lombok.Getter;
+import lombok.NoArgsConstructor;
 
 import java.time.LocalDateTime;
 import java.util.List;
 
-@Entity
 @Getter
+@Entity
 @Table(name = "concert_halls")
+@NoArgsConstructor(access = AccessLevel.PROTECTED)
 public class ConcertHallJpaEntity {
 
     @Id

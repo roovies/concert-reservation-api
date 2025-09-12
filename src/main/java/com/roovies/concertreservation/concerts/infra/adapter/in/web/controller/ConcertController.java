@@ -3,7 +3,7 @@ package com.roovies.concertreservation.concerts.infra.adapter.in.web.controller;
 import com.roovies.concertreservation.concerts.application.port.in.GetConcertByIdUseCase;
 import com.roovies.concertreservation.concerts.infra.adapter.in.web.dto.request.GetConcertsRequest;
 import com.roovies.concertreservation.concerts.application.dto.result.GetConcertByIdResult;
-import com.roovies.concertreservation.concerts.application.dto.result.GetConcertsResult;
+import com.roovies.concertreservation.concerts.application.dto.result.GetConcertListResult;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.media.Content;
 import io.swagger.v3.oas.annotations.media.Schema;
@@ -67,7 +67,7 @@ public class ConcertController {
                     @ApiResponse(
                             responseCode = "200",
                             description = "콘서트 목록 조회 성공",
-                            content = @Content(schema = @Schema(implementation = GetConcertsResult.class))
+                            content = @Content(schema = @Schema(implementation = GetConcertListResult.class))
                     ),
                     @ApiResponse(
                             responseCode = "400",
@@ -84,23 +84,23 @@ public class ConcertController {
             }
     )
     @GetMapping
-    public ResponseEntity<GetConcertsResult> getConcerts(@Valid @RequestBody GetConcertsRequest request) {
-        List<GetConcertsResult.ConcertInfo> dummyItems = List.of(
-                GetConcertsResult.ConcertInfo.builder()
+    public ResponseEntity<GetConcertListResult> getConcerts(@Valid @RequestBody GetConcertsRequest request) {
+        List<GetConcertListResult.ConcertInfo> dummyItems = List.of(
+                GetConcertListResult.ConcertInfo.builder()
                         .id(101L)
                         .title("K-Pop Concert 2025")
                         .startDate(LocalDate.of(2025, 9, 1))
                         .endDate(LocalDate.of(2025, 9, 5))
                         .totalSeats(1000)
                         .build(),
-                GetConcertsResult.ConcertInfo.builder()
+                GetConcertListResult.ConcertInfo.builder()
                         .id(102L)
                         .title("Jazz Night Live")
                         .startDate(LocalDate.of(2025, 9, 10))
                         .endDate(LocalDate.of(2025, 9, 12))
                         .totalSeats(800)
                         .build(),
-                GetConcertsResult.ConcertInfo.builder()
+                GetConcertListResult.ConcertInfo.builder()
                         .id(103L)
                         .title("Rock Festival 2025")
                         .startDate(LocalDate.of(2025, 9, 15))
@@ -109,7 +109,7 @@ public class ConcertController {
                         .build()
         );
 
-        GetConcertsResult response = GetConcertsResult.builder()
+        GetConcertListResult response = GetConcertListResult.builder()
                 .items(dummyItems)
                 .page(1)
                 .size(10)

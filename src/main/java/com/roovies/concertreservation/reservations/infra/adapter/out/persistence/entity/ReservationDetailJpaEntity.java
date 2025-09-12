@@ -3,16 +3,19 @@ package com.roovies.concertreservation.reservations.infra.adapter.out.persistenc
 import com.roovies.concertreservation.concerthalls.infra.adapter.out.persistence.entity.ConcertHallSeatJpaEntity;
 import com.roovies.concertreservation.concerts.infra.adapter.out.persistence.entity.ConcertScheduleJpaEntity;
 import jakarta.persistence.*;
+import lombok.AccessLevel;
 import lombok.Getter;
+import lombok.NoArgsConstructor;
 
-@Entity
 @Getter
+@Entity
 @Table(
         name = "reservation_details",
         uniqueConstraints = {
                 @UniqueConstraint(columnNames = {"schedule_id", "seat_id"})
         }
 )
+@NoArgsConstructor(access = AccessLevel.PROTECTED)
 public class ReservationDetailJpaEntity {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)

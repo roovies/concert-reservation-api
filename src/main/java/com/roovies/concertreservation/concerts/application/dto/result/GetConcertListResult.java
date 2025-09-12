@@ -8,7 +8,7 @@ import java.util.List;
 
 @Builder
 @Schema(description = "콘서트 목록 조회 응답 DTO")
-public record GetConcertsResult(
+public record GetConcertListResult(
         @Schema(description = "내역 리스트")
         List<ConcertInfo> items,
 

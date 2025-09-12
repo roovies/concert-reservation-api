@@ -3,11 +3,11 @@ package com.roovies.concertreservation.reservations.application;
 import com.roovies.concertreservation.concerthalls.domain.enums.SeatType;
 import com.roovies.concertreservation.concerts.domain.enums.ReservationStatus;
 import com.roovies.concertreservation.reservations.application.dto.query.GetAvailableSeatsQuery;
-import com.roovies.concertreservation.reservations.application.dto.result.GetAvailableSeatsResult;
+import com.roovies.concertreservation.reservations.application.dto.result.GetAvailableSeatListResult;
 import com.roovies.concertreservation.reservations.application.port.out.ConcertHallQueryPort;
 import com.roovies.concertreservation.reservations.application.port.out.ConcertQueryPort;
 import com.roovies.concertreservation.reservations.application.port.out.ReservationRepositoryPort;
-import com.roovies.concertreservation.reservations.application.service.GetAvailableSeatsService;
+import com.roovies.concertreservation.reservations.application.service.GetAvailableSeatListService;
 import com.roovies.concertreservation.reservations.domain.entity.Reservation;
 import com.roovies.concertreservation.reservations.domain.entity.ReservationDetail;
 import com.roovies.concertreservation.reservations.domain.enums.PaymentStatus;
@@ -41,7 +41,7 @@ public class GetAvailableSeatsUseCaseTest {
     private ConcertHallQueryPort concertHallQueryPort;
 
     @InjectMocks
-    private GetAvailableSeatsService getAvailableSeatsService;
+    private GetAvailableSeatListService getAvailableSeatListService;
 
     @Test
     void 콘서트나_일정이_유효하지_않으면_예외가_발생해야_한다() {
@@ -55,7 +55,7 @@ public class GetAvailableSeatsUseCaseTest {
                 .willThrow(NoSuchElementException.class);
 
         // when & then
-        assertThatThrownBy(() -> getAvailableSeatsService.execute(query))
+        assertThatThrownBy(() -> getAvailableSeatListService.execute(query))
                 .isInstanceOf(NoSuchElementException.class);
     }
 
@@ -79,7 +79,7 @@ public class GetAvailableSeatsUseCaseTest {
                 .willReturn(schedule);
 
         // when
-        GetAvailableSeatsResult result = getAvailableSeatsService.execute(query);
+        GetAvailableSeatListResult result = getAvailableSeatListService.execute(query);
 
         // then
         assertThat(result).isNotNull();
@@ -110,7 +110,7 @@ public class GetAvailableSeatsUseCaseTest {
                 .willReturn(schedule);
 
         // when
-        GetAvailableSeatsResult result = getAvailableSeatsService.execute(query);
+        GetAvailableSeatListResult result = getAvailableSeatListService.execute(query);
 
         // then
         assertThat(result).isNotNull();
@@ -164,14 +164,14 @@ public class GetAvailableSeatsUseCaseTest {
                                 .build()
                 ))
                 .build();
-        given(concertHallQueryPort.findConcertHallById(schedule.concertHallId()))
+        given(concertHallQueryPort.findConcertHallWithSeats(schedule.concertHallId()))
                 .willReturn(hall);
 
         given(reservationRepositoryPort.findReservationsByDetailScheduleId(schedule.id()))
                 .willReturn(Collections.emptyList());
 
         // when
-        GetAvailableSeatsResult result = getAvailableSeatsService.execute(query);
+        GetAvailableSeatListResult result = getAvailableSeatListService.execute(query);
 
         // then
         assertThat(result).isNotNull();
@@ -224,7 +224,7 @@ public class GetAvailableSeatsUseCaseTest {
                                 .build()
                 ))
                 .build();
-        given(concertHallQueryPort.findConcertHallById(schedule.concertHallId()))
+        given(concertHallQueryPort.findConcertHallWithSeats(schedule.concertHallId()))
                 .willReturn(hall);
 
         // 좌석 1이 예약된 상황
@@ -239,7 +239,7 @@ public class GetAvailableSeatsUseCaseTest {
                 .willReturn(reservations);
 
         // when
-        GetAvailableSeatsResult result = getAvailableSeatsService.execute(query);
+        GetAvailableSeatListResult result = getAvailableSeatListService.execute(query);
 
         // then
         assertThat(result).isNotNull();

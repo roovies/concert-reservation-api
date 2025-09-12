@@ -2,13 +2,16 @@ package com.roovies.concertreservation.concerthalls.infra.adapter.out.persistenc
 
 import com.roovies.concertreservation.concerthalls.domain.enums.SeatType;
 import jakarta.persistence.*;
+import lombok.AccessLevel;
 import lombok.Getter;
+import lombok.NoArgsConstructor;
 
 import java.time.LocalDateTime;
 
+@Getter
 @Entity
 @Table(name = "concert_hall_seats")
-@Getter
+@NoArgsConstructor(access = AccessLevel.PROTECTED)
 public class ConcertHallSeatJpaEntity {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)

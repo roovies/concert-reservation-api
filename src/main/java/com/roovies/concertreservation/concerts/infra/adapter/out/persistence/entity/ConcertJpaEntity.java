@@ -1,15 +1,18 @@
 package com.roovies.concertreservation.concerts.infra.adapter.out.persistence.entity;
 
 import jakarta.persistence.*;
+import lombok.AccessLevel;
 import lombok.Getter;
+import lombok.NoArgsConstructor;
 
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.util.List;
 
-@Entity
 @Getter
+@Entity
 @Table(name = "concerts")
+@NoArgsConstructor(access = AccessLevel.PROTECTED)
 public class ConcertJpaEntity {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)

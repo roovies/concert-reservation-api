@@ -3,14 +3,17 @@ package com.roovies.concertreservation.reservations.infra.adapter.out.persistenc
 import com.roovies.concertreservation.reservations.domain.enums.PaymentStatus;
 import com.roovies.concertreservation.users.infra.adapter.out.persistence.entity.UserJpaEntity;
 import jakarta.persistence.*;
+import lombok.AccessLevel;
 import lombok.Getter;
+import lombok.NoArgsConstructor;
 
 import java.time.LocalDateTime;
 import java.util.*;
 
-@Entity
 @Getter
+@Entity
 @Table(name = "reservations")
+@NoArgsConstructor(access = AccessLevel.PROTECTED)
 public class ReservationJpaEntity {
 
     @Id

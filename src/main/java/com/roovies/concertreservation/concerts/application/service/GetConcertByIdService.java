@@ -23,7 +23,7 @@ public class GetConcertByIdService implements GetConcertByIdUseCase {
 
     @Override
     public GetConcertByIdResult execute(Long concertId) {
-        // MEMO: Controller에서 검증하고, 테스트 코드는 Controller에서 다뤄도 괜찮을 것 같음
+        // NOTE: Controller에서 검증하고, 테스트 코드는 Controller에서 다뤄도 괜찮을 것 같음
         if (concertId == null || concertId < 1L)
             throw new IllegalArgumentException("유효하지 않은 콘서트ID입니다.");
 
@@ -34,17 +34,6 @@ public class GetConcertByIdService implements GetConcertByIdUseCase {
         ConcertHallSnapShot concertHall = concertHallQueryPort.findConcertHallById(concertHallId);
         LocalDate now = LocalDate.now(clock);
 
-        return GetConcertByIdResult.builder()
-                .id(concert.getId())
-                .title(concert.getTitle())
-                .description(concert.getDescription())
-                .minPrice(concert.getMinPrice())
-                .startDate(concert.getStartDate())
-                .endDate(concert.getEndDate())
-                .status(concert.getStatus(now))
-                .concertHallName(concertHall.name())
-                .createdAt(concert.getCreatedAt())
-                .updatedAt(concert.getUpdatedAt())
-                .build();
+        return GetConcertByIdResult.from(concert, concert.getStatus(now), concertHall);
     }
 }
