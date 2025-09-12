@@ -27,3 +27,4 @@ spring:
     properties:
       hibernate.timezone.default_storage: NORMALIZE_UTC
       hibernate.jdbc.time_zone: UTC
+    database-platform: org.hibernate.dialect.MySQL8Dialect
