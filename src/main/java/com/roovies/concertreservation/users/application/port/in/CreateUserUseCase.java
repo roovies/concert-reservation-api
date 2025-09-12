@@ -1,4 +1,4 @@
-package com.roovies.concertreservation.users.application.port.in.usecase.internal;
+package com.roovies.concertreservation.users.application.port.in;
 
 public interface CreateUserUseCase {
 }

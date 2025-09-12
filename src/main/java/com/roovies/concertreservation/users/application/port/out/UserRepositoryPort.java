@@ -1,4 +1,4 @@
 package com.roovies.concertreservation.users.application.port.out;
 
-public interface UserRepository {
+public interface UserRepositoryPort {
 }

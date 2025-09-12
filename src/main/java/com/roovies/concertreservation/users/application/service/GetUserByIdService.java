@@ -1,6 +1,6 @@
-package com.roovies.concertreservation.users.application.impl.usecase.external;
+package com.roovies.concertreservation.users.application.service;
 
-import com.roovies.concertreservation.users.application.port.in.usecase.external.GetUserInfoUseCase;
+import com.roovies.concertreservation.users.application.port.in.GetUserByIdUseCase;
 
-public class GetUserInfoUseCaseImpl implements GetUserInfoUseCase {
+public class GetUserByIdService implements GetUserByIdUseCase {
 }

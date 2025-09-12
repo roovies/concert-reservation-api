@@ -4,6 +4,6 @@ import com.roovies.concertreservation.users.application.port.out.UserRepositoryP
 import lombok.RequiredArgsConstructor;
 
 @RequiredArgsConstructor
-public class UserRepositoryPortImpl implements UserRepositoryPort {
+public class UserRepositoryAdapter implements UserRepositoryPort {
     private final UserJpaRepository userJpaRepository;
 }

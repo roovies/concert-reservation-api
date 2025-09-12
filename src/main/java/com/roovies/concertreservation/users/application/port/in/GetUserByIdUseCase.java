@@ -1,4 +1,4 @@
-package com.roovies.concertreservation.users.application.port.in.usecase.external;
+package com.roovies.concertreservation.users.application.port.in;
 
-public interface GetUserInfoUseCase {
+public interface GetUserByIdUseCase {
 }

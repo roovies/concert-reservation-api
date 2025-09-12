@@ -1,6 +1,6 @@
-package com.roovies.concertreservation.users.application.impl.usecase.internal;
+package com.roovies.concertreservation.users.application.service;
 
-import com.roovies.concertreservation.users.application.port.in.usecase.internal.CreateUserUseCase;
+import com.roovies.concertreservation.users.application.port.in.CreateUserUseCase;
 
-public class CreateUserUseCaseImp implements CreateUserUseCase {
+public class CreateUserService implements CreateUserUseCase {
 }

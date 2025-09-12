@@ -1,4 +1,4 @@
 package com.roovies.concertreservation.users.application.dto.response;
 
-public record GetOrderByIdResponse() {
+public record GetUserByIdResult() {
 }
