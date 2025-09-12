@@ -1,6 +1,6 @@
 package com.roovies.concertreservation.reservations.infra.adapter.in.web.dto.response;
 
-import com.roovies.concertreservation.concerthalls.domain.enums.SeatType;
+import com.roovies.concertreservation.venues.domain.enums.SeatType;
 import io.swagger.v3.oas.annotations.media.Schema;
 import lombok.Builder;
 

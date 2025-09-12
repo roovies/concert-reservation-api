@@ -3,14 +3,14 @@ package com.roovies.concertreservation.reservations.application.service;
 import com.roovies.concertreservation.reservations.application.dto.query.GetAvailableSeatsQuery;
 import com.roovies.concertreservation.reservations.application.dto.result.GetAvailableSeatListResult;
 import com.roovies.concertreservation.reservations.application.port.in.GetAvailableSeatsUseCase;
-import com.roovies.concertreservation.reservations.application.port.out.ConcertHallQueryPort;
-import com.roovies.concertreservation.reservations.application.port.out.ConcertQueryPort;
+import com.roovies.concertreservation.reservations.application.port.out.ReservationVenueQueryPort;
+import com.roovies.concertreservation.reservations.application.port.out.ReservationConcertQueryPort;
 import com.roovies.concertreservation.reservations.application.port.out.ReservationRepositoryPort;
 import com.roovies.concertreservation.reservations.domain.entity.Reservation;
 import com.roovies.concertreservation.reservations.domain.entity.ReservationDetail;
 import com.roovies.concertreservation.reservations.domain.enums.PaymentStatus;
-import com.roovies.concertreservation.reservations.domain.vo.external.ConcertHallSnapShot;
-import com.roovies.concertreservation.reservations.domain.vo.external.ConcertScheduleSnapShot;
+import com.roovies.concertreservation.reservations.domain.vo.external.ReservationVenueSnapShot;
+import com.roovies.concertreservation.reservations.domain.vo.external.ReservationConcertScheduleSnapShot;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
@@ -23,14 +23,14 @@ import java.util.stream.Collectors;
 @RequiredArgsConstructor
 public class GetAvailableSeatListService implements GetAvailableSeatsUseCase {
 
-    private final ConcertQueryPort concertQueryPort;
-    private final ConcertHallQueryPort concertHallQueryPort;
+    private final ReservationConcertQueryPort reservationConcertQueryPort;
+    private final ReservationVenueQueryPort reservationVenueQueryPort;
     private final ReservationRepositoryPort reservationRepositoryPort;
 
     @Override
     public GetAvailableSeatListResult execute(GetAvailableSeatsQuery query) {
         // 1. 해당 날짜의 콘서트 스케줄 정보 조회
-        ConcertScheduleSnapShot schedule = concertQueryPort.findConcertSchedule(query.concertId(), query.date());
+        ReservationConcertScheduleSnapShot schedule = reservationConcertQueryPort.findConcertSchedule(query.concertId(), query.date());
 
         // 2. 예약 가능 좌석수, 예약 상태가 매진일 경우 매진 상태 반환
         if (schedule.isSoldOut())
@@ -52,9 +52,9 @@ public class GetAvailableSeatListService implements GetAvailableSeatsUseCase {
                 .build();
     }
 
-    private List<GetAvailableSeatListResult.SeatInfo> getAvailableSeats(ConcertScheduleSnapShot schedule) {
+    private List<GetAvailableSeatListResult.SeatInfo> getAvailableSeats(ReservationConcertScheduleSnapShot schedule) {
         // 1. 공연장 및 좌석 조회
-        ConcertHallSnapShot concertHall = concertHallQueryPort.findConcertHallWithSeats(schedule.concertHallId());
+        ReservationVenueSnapShot venue = reservationVenueQueryPort.findVenueWithSeats(schedule.venueId());
 
         // 2. 해당 스케줄에 등록된 예약 목록 조회
         List<Reservation> reservations = reservationRepositoryPort.findReservationsByDetailScheduleId(schedule.id());
@@ -69,7 +69,7 @@ public class GetAvailableSeatListService implements GetAvailableSeatsUseCase {
                 .collect(Collectors.toSet());
 
         // 4. 예약가능한 좌석만 추출
-        return concertHall.seats().stream()
+        return venue.seats().stream()
                 .filter(seat -> !reservedSeatIds.contains(seat.id()))
                 .map(seat -> GetAvailableSeatListResult.SeatInfo.builder()
                         .seatId(seat.id())

@@ -1,6 +1,6 @@
 package com.roovies.concertreservation.reservations.application.dto.result;
 
-import com.roovies.concertreservation.concerthalls.domain.enums.SeatType;
+import com.roovies.concertreservation.venues.domain.enums.SeatType;
 import lombok.Builder;
 
 import java.time.LocalDate;

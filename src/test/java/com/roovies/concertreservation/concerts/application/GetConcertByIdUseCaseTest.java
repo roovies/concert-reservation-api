@@ -1,13 +1,13 @@
 package com.roovies.concertreservation.concerts.application;
 
 import com.roovies.concertreservation.concerts.application.dto.result.GetConcertByIdResult;
-import com.roovies.concertreservation.concerts.application.port.out.ConcertHallQueryPort;
+import com.roovies.concertreservation.concerts.application.port.out.ConcertVenueQueryPort;
 import com.roovies.concertreservation.concerts.application.service.GetConcertByIdService;
 import com.roovies.concertreservation.concerts.application.port.out.ConcertRepositoryPort;
 import com.roovies.concertreservation.concerts.domain.entity.Concert;
 import com.roovies.concertreservation.concerts.domain.entity.ConcertSchedule;
 import com.roovies.concertreservation.concerts.domain.enums.ReservationStatus;
-import com.roovies.concertreservation.concerts.domain.vo.external.ConcertHallSnapShot;
+import com.roovies.concertreservation.concerts.domain.vo.external.ConcertVenueSnapShot;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.junit.jupiter.params.ParameterizedTest;
@@ -29,7 +29,7 @@ public class GetConcertByIdUseCaseTest {
     private ConcertRepositoryPort concertRepositoryPort;
 
     @Mock
-    private ConcertHallQueryPort concertHallQueryPort;
+    private ConcertVenueQueryPort concertVenueQueryPort;
 
     @Mock
     private Clock clock;
@@ -108,16 +108,16 @@ public class GetConcertByIdUseCaseTest {
                 .willReturn(Optional.of(concert));
 
         // 공연장 정보 Mocking
-        ConcertHallSnapShot concertHallSnapShot = ConcertHallSnapShot.builder()
+        ConcertVenueSnapShot concertVenueSnapShot = ConcertVenueSnapShot.builder()
                 .id(5L)
                 .name("인천 아시아드 주경기장")
                 .totalSeats(1000)
                 .build();
 
-        Long concertHallId = concert.getSchedule(concert.getStartDate()).getConcertHallId();
+        Long venueId = concert.getSchedule(concert.getStartDate()).getVenueId();
 
-        given(concertHallQueryPort.findConcertHallById(concertHallId))
-                .willReturn(concertHallSnapShot);
+        given(concertVenueQueryPort.findVenueById(venueId))
+                .willReturn(concertVenueSnapShot);
 
         // when
         GetConcertByIdResult result = getConcertService.execute(1L);
@@ -131,7 +131,7 @@ public class GetConcertByIdUseCaseTest {
         assertThat(result.startDate()).isEqualTo(startDate);
         assertThat(result.endDate()).isEqualTo(endDate);
         assertThat(result.status()).isEqualTo(concert.getStatus(today));
-        assertThat(result.concertHallName()).isEqualTo("인천 아시아드 주경기장");
+        assertThat(result.venueName()).isEqualTo("인천 아시아드 주경기장");
         assertThat(result.createdAt()).isEqualTo(createdAt);
         assertThat(result.updatedAt()).isNull();
     }

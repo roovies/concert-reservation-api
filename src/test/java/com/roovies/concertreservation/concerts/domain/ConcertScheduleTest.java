@@ -19,17 +19,17 @@ public class ConcertScheduleTest {
         int totalSeats = 100;
         int availableSeats = 100;
         ReservationStatus reservationStatus = ReservationStatus.AVAILABLE;
-        Long concertHallId = 10L;
+        Long venueId = 10L;
 
         // when
-        ConcertSchedule schedule = ConcertSchedule.create(scheduleId, concertId, date, totalSeats, availableSeats, reservationStatus, concertHallId);
+        ConcertSchedule schedule = ConcertSchedule.create(scheduleId, concertId, date, totalSeats, availableSeats, reservationStatus, venueId);
 
         // then
         assertThat(schedule.getId()).isEqualTo(scheduleId);
         assertThat(schedule.getDate()).isEqualTo(date);
         assertThat(schedule.getTotalSeats()).isEqualTo(totalSeats);
         assertThat(schedule.getAvailableSeats()).isEqualTo(availableSeats);
-        assertThat(schedule.getConcertHallId()).isEqualTo(concertHallId);
+        assertThat(schedule.getVenueId()).isEqualTo(venueId);
     }
 
     @Test
@@ -41,10 +41,10 @@ public class ConcertScheduleTest {
         int totalSeats = 100;
         int availableSeats = 100;
         ReservationStatus reservationStatus = ReservationStatus.AVAILABLE;
-        Long concertHallId = 10L;
+        Long venueId = 10L;
 
         // when
-        ConcertSchedule schedule = ConcertSchedule.create(scheduleId, concertId, date, totalSeats, availableSeats, reservationStatus, concertHallId);
+        ConcertSchedule schedule = ConcertSchedule.create(scheduleId, concertId, date, totalSeats, availableSeats, reservationStatus, venueId);
 
         // then
         assertThat(schedule.getAvailableSeats()).isEqualTo(totalSeats);
@@ -59,10 +59,10 @@ public class ConcertScheduleTest {
         int totalSeats = 100;
         int availableSeats = 101;
         ReservationStatus reservationStatus = ReservationStatus.AVAILABLE;
-        Long concertHallId = 10L;
+        Long venueId = 10L;
 
         // when & then
-        assertThatThrownBy(() -> ConcertSchedule.create(scheduleId, concertId, date, totalSeats, availableSeats, reservationStatus, concertHallId))
+        assertThatThrownBy(() -> ConcertSchedule.create(scheduleId, concertId, date, totalSeats, availableSeats, reservationStatus, venueId))
                 .isInstanceOf(IllegalArgumentException.class)
                 .hasMessage("예약 가능한 좌석의 수는 전체 좌석 수보다 많을 수 없습니다.");
     }

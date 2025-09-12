@@ -1,6 +1,6 @@
 package com.roovies.concertreservation.concerts.infra.adapter.out.persistence.entity;
 
-import com.roovies.concertreservation.concerthalls.infra.adapter.out.persistence.entity.ConcertHallJpaEntity;
+import com.roovies.concertreservation.venues.infra.adapter.out.persistence.entity.VenueJpaEntity;
 import com.roovies.concertreservation.concerts.domain.enums.ReservationStatus;
 import jakarta.persistence.*;
 import lombok.AccessLevel;
@@ -24,8 +24,8 @@ public class ConcertScheduleJpaEntity {
     private ConcertJpaEntity concert;
 
     @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "concert_hall_id", nullable = false)
-    private ConcertHallJpaEntity concertHall;
+    @JoinColumn(name = "venue_id", nullable = false)
+    private VenueJpaEntity venue;
 
     @Column(name = "schedule_date", nullable = false)
     private LocalDate scheduleDate;

@@ -2,10 +2,10 @@ package com.roovies.concertreservation.concerts.application.service;
 
 import com.roovies.concertreservation.concerts.application.dto.result.GetConcertByIdResult;
 import com.roovies.concertreservation.concerts.application.port.in.GetConcertByIdUseCase;
-import com.roovies.concertreservation.concerts.application.port.out.ConcertHallQueryPort;
+import com.roovies.concertreservation.concerts.application.port.out.ConcertVenueQueryPort;
 import com.roovies.concertreservation.concerts.application.port.out.ConcertRepositoryPort;
 import com.roovies.concertreservation.concerts.domain.entity.Concert;
-import com.roovies.concertreservation.concerts.domain.vo.external.ConcertHallSnapShot;
+import com.roovies.concertreservation.concerts.domain.vo.external.ConcertVenueSnapShot;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
@@ -18,7 +18,7 @@ import java.util.NoSuchElementException;
 public class GetConcertByIdService implements GetConcertByIdUseCase {
 
     private final ConcertRepositoryPort concertRepositoryPort;
-    private final ConcertHallQueryPort concertHallQueryPort;
+    private final ConcertVenueQueryPort concertVenueQueryPort;
     private final Clock clock; // LocalDate.now()를 Mocking으로 테스팅하기 위함
 
     @Override
@@ -30,10 +30,10 @@ public class GetConcertByIdService implements GetConcertByIdUseCase {
         Concert concert = concertRepositoryPort.findByIdWithSchedules(concertId)
                 .orElseThrow(() -> new NoSuchElementException("콘서트를 찾을 수 없습니다."));
 
-        Long concertHallId = concert.getSchedule(concert.getStartDate()).getConcertHallId();
-        ConcertHallSnapShot concertHall = concertHallQueryPort.findConcertHallById(concertHallId);
+        Long venueId = concert.getSchedule(concert.getStartDate()).getVenueId();
+        ConcertVenueSnapShot venue = concertVenueQueryPort.findVenueById(venueId);
         LocalDate now = LocalDate.now(clock);
 
-        return GetConcertByIdResult.from(concert, concert.getStatus(now), concertHall);
+        return GetConcertByIdResult.from(concert, concert.getStatus(now), venue);
     }
 }

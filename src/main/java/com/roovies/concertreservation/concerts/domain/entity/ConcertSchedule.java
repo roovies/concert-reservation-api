@@ -15,22 +15,22 @@ public class ConcertSchedule {
     private ReservationStatus reservationStatus;
 
     // 다른 Aggregate Root 참조
-    private final Long concertHallId;
+    private final Long venueId;
 
     public static ConcertSchedule create(
             Long id, Long concertId,
             LocalDate scheduleDate,
             int totalSeats, int availableSeats,
-            ReservationStatus reservationStatus, Long concertHallId
+            ReservationStatus reservationStatus, Long venueId
     ) {
-        return new ConcertSchedule(id, concertId, scheduleDate, totalSeats, availableSeats, reservationStatus, concertHallId);
+        return new ConcertSchedule(id, concertId, scheduleDate, totalSeats, availableSeats, reservationStatus, venueId);
     }
 
     private ConcertSchedule(
             Long id, Long concertId,
             LocalDate date,
             int totalSeats, int availableSeats,
-            ReservationStatus reservationStatus, Long concertHallId
+            ReservationStatus reservationStatus, Long venueId
     ) {
         // availableSeats > totalSeats인지 검증
         if (availableSeats > totalSeats)
@@ -42,7 +42,7 @@ public class ConcertSchedule {
         this.totalSeats = totalSeats;
         this.availableSeats = availableSeats;
         this.reservationStatus = reservationStatus;
-        this.concertHallId = concertHallId;
+        this.venueId = venueId;
     }
 
     public int decreaseAvailableSeats(int count) {

@@ -2,7 +2,7 @@ package com.roovies.concertreservation.concerts.application.dto.result;
 
 import com.roovies.concertreservation.concerts.domain.entity.Concert;
 import com.roovies.concertreservation.concerts.domain.enums.ConcertStatus;
-import com.roovies.concertreservation.concerts.domain.vo.external.ConcertHallSnapShot;
+import com.roovies.concertreservation.concerts.domain.vo.external.ConcertVenueSnapShot;
 import io.swagger.v3.oas.annotations.media.Schema;
 
 import java.time.LocalDate;
@@ -32,7 +32,7 @@ public record GetConcertByIdResult(
         ConcertStatus status,
 
         @Schema(description = "공연장명", example = "인천 아시아드 경기장")
-        String concertHallName,
+        String venueName,
 
         @Schema(description = "생성일", example = "2025-08-26T21:00:00")
         LocalDateTime createdAt,
@@ -40,7 +40,7 @@ public record GetConcertByIdResult(
         @Schema(description = "수정일", example = "2025-08-26T21:00:00")
         LocalDateTime updatedAt
 ) {
-        public static GetConcertByIdResult from(Concert concert, ConcertStatus concertStatus, ConcertHallSnapShot concertHall) {
+        public static GetConcertByIdResult from(Concert concert, ConcertStatus concertStatus, ConcertVenueSnapShot venue) {
                 return new GetConcertByIdResult(
                         concert.getId(),
                         concert.getTitle(),
@@ -49,7 +49,7 @@ public record GetConcertByIdResult(
                         concert.getStartDate(),
                         concert.getEndDate(),
                         concertStatus,
-                        concertHall.name(),
+                        venue.name(),
                         concert.getCreatedAt(),
                         concert.getUpdatedAt()
                 );
