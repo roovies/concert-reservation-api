@@ -43,6 +43,8 @@ dependencies {
 
 	// Spring Data Redis
 	implementation("org.springframework.boot:spring-boot-starter-data-redis")
+	// Redisson
+	implementation("org.redisson:redisson-spring-boot-starter:3.51.0")
 
 	// OpenAPI
 	implementation("org.springdoc:springdoc-openapi-starter-webmvc-ui:2.1.0")
