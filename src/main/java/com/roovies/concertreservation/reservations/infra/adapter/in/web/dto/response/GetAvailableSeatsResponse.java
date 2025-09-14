@@ -13,6 +13,9 @@ public record GetAvailableSeatsResponse(
         @Schema(description = "콘서트 ID", example = "101")
         Long concertId,
 
+        @Schema(description = "콘서트 스케줄 ID", example = "101")
+        Long concertScheduleId,
+
         @Schema(description = "조회 날짜", example = "2025-09-01")
         LocalDate date,
 

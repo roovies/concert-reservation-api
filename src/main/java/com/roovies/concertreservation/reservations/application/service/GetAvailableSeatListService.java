@@ -36,6 +36,7 @@ public class GetAvailableSeatListService implements GetAvailableSeatsUseCase {
         if (schedule.isSoldOut())
             return GetAvailableSeatListResult.builder()
                     .concertId(query.concertId())
+                    .concertScheduleId(schedule.id())
                     .date(query.date())
                     .isAllReserved(true)
                     .availableSeats(new ArrayList<>())
@@ -46,6 +47,7 @@ public class GetAvailableSeatListService implements GetAvailableSeatsUseCase {
 
         return GetAvailableSeatListResult.builder()
                 .concertId(query.concertId())
+                .concertScheduleId(schedule.id())
                 .date(query.date())
                 .isAllReserved(false)
                 .availableSeats(availableSeats)

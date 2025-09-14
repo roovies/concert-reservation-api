@@ -9,6 +9,7 @@ import java.util.List;
 @Builder
 public record GetAvailableSeatListResult(
         Long concertId,
+        Long concertScheduleId,
         LocalDate date,
         List<SeatInfo> availableSeats,
         boolean isAllReserved

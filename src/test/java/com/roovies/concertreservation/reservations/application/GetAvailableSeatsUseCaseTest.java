@@ -84,6 +84,7 @@ public class GetAvailableSeatsUseCaseTest {
         // then
         assertThat(result).isNotNull();
         assertThat(result.concertId()).isEqualTo(query.concertId());
+        assertThat(result.concertScheduleId()).isEqualTo(schedule.id());
         assertThat(result.date()).isEqualTo(query.date());
         assertThat(result.availableSeats()).isEmpty();
         assertThat(result.isAllReserved()).isTrue();
@@ -115,6 +116,7 @@ public class GetAvailableSeatsUseCaseTest {
         // then
         assertThat(result).isNotNull();
         assertThat(result.concertId()).isEqualTo(query.concertId());
+        assertThat(result.concertScheduleId()).isEqualTo(schedule.id());
         assertThat(result.date()).isEqualTo(query.date());
         assertThat(result.availableSeats()).isEmpty();
         assertThat(result.isAllReserved()).isTrue();
@@ -139,7 +141,7 @@ public class GetAvailableSeatsUseCaseTest {
         given(reservationConcertQueryPort.findConcertSchedule(query.concertId(), query.date()))
                 .willReturn(schedule);
 
-        ReservationVenueSnapShot hall = ReservationVenueSnapShot.builder()
+        ReservationVenueSnapShot venue = ReservationVenueSnapShot.builder()
                 .id(10L)
                 .name("인천 아시아드 주경기장")
                 .totalSeats(3)
@@ -165,7 +167,7 @@ public class GetAvailableSeatsUseCaseTest {
                 ))
                 .build();
         given(reservationVenueQueryPort.findVenueWithSeats(schedule.venueId()))
-                .willReturn(hall);
+                .willReturn(venue);
 
         given(reservationRepositoryPort.findReservationsByDetailScheduleId(schedule.id()))
                 .willReturn(Collections.emptyList());
@@ -176,6 +178,7 @@ public class GetAvailableSeatsUseCaseTest {
         // then
         assertThat(result).isNotNull();
         assertThat(result.concertId()).isEqualTo(query.concertId());
+        assertThat(result.concertScheduleId()).isEqualTo(schedule.id());
         assertThat(result.date()).isEqualTo(query.date());
         assertThat(result.availableSeats()).hasSize(3);
         assertThat(result.isAllReserved()).isFalse();
@@ -244,6 +247,7 @@ public class GetAvailableSeatsUseCaseTest {
         // then
         assertThat(result).isNotNull();
         assertThat(result.concertId()).isEqualTo(query.concertId());
+        assertThat(result.concertScheduleId()).isEqualTo(schedule.id());
         assertThat(result.date()).isEqualTo(query.date());
         assertThat(result.availableSeats()).hasSize(2);
         assertThat(result.isAllReserved()).isFalse();
