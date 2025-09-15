@@ -1,9 +1,9 @@
-package com.roovies.concertreservation.point.infra.adapter.in.web.controller;
+package com.roovies.concertreservation.points.infra.adapter.in.web.controller;
 
-import com.roovies.concertreservation.point.infra.adapter.in.web.dto.request.GetPointHistoryRequest;
-import com.roovies.concertreservation.point.infra.adapter.in.web.dto.response.GetPointHistoryResponse;
-import com.roovies.concertreservation.point.infra.adapter.in.web.dto.response.GetPointResponse;
-import com.roovies.concertreservation.point.infra.adapter.in.web.dto.response.UpdatePointResponse;
+import com.roovies.concertreservation.points.infra.adapter.in.web.dto.request.GetPointHistoryRequest;
+import com.roovies.concertreservation.points.infra.adapter.in.web.dto.response.GetPointHistoryResponse;
+import com.roovies.concertreservation.points.infra.adapter.in.web.dto.response.GetPointResponse;
+import com.roovies.concertreservation.points.infra.adapter.in.web.dto.response.UpdatePointResponse;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
 import io.swagger.v3.oas.annotations.Parameters;

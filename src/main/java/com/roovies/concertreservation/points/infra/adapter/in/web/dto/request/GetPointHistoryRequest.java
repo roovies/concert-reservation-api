@@ -1,4 +1,4 @@
-package com.roovies.concertreservation.point.infra.adapter.in.web.dto.request;
+package com.roovies.concertreservation.points.infra.adapter.in.web.dto.request;
 
 import io.swagger.v3.oas.annotations.media.Schema;
 import jakarta.validation.constraints.Min;
