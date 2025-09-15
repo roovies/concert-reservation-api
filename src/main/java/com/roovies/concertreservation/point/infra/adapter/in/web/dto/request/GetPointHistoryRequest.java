@@ -1,4 +1,4 @@
-package com.roovies.concertreservation.balance.infra.adapter.in.web.dto.request;
+package com.roovies.concertreservation.point.infra.adapter.in.web.dto.request;
 
 import io.swagger.v3.oas.annotations.media.Schema;
 import jakarta.validation.constraints.Min;
@@ -6,8 +6,8 @@ import jakarta.validation.constraints.PositiveOrZero;
 
 import java.time.LocalDate;
 
-@Schema(description = "잔액 충전/사용/환불 내역 요청 DTO")
-public record GetBalanceHistoryRequest(
+@Schema(description = "포인트 충전/사용/환불 내역 요청 DTO")
+public record GetPointHistoryRequest(
         @Schema(description = "페이지 번호 (0부터 시작)", example = "0")
         @PositiveOrZero
         int page,
@@ -28,7 +28,7 @@ public record GetBalanceHistoryRequest(
         @Schema(description = "조회 종료 일시", example = "2025-08-25")
         LocalDate endDate
 ) {
-    public GetBalanceHistoryRequest {
+    public GetPointHistoryRequest {
         // 기본값 처리
         page = page < 0 ? 0 : page;
         size = size < 1 ? 20 : size;
