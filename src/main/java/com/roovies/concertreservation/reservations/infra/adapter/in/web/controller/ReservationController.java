@@ -1,12 +1,14 @@
 package com.roovies.concertreservation.reservations.infra.adapter.in.web.controller;
 
+import com.roovies.concertreservation.reservations.application.dto.command.HoldSeatCommand;
 import com.roovies.concertreservation.reservations.application.dto.query.GetAvailableSeatsQuery;
 import com.roovies.concertreservation.reservations.application.dto.result.GetAvailableSeatListResult;
+import com.roovies.concertreservation.reservations.application.dto.result.HoldSeatResult;
 import com.roovies.concertreservation.reservations.application.port.in.GetAvailableSeatsUseCase;
+import com.roovies.concertreservation.reservations.application.port.in.HoldSeatUseCase;
 import com.roovies.concertreservation.reservations.infra.adapter.in.web.dto.request.CreateReservationRequest;
 import com.roovies.concertreservation.reservations.infra.adapter.in.web.dto.request.GetReservationHistoryRequest;
 import com.roovies.concertreservation.reservations.infra.adapter.in.web.dto.response.CreateReservationResponse;
-import com.roovies.concertreservation.reservations.infra.adapter.in.web.dto.response.GetAvailableSchedulesResponse;
 import com.roovies.concertreservation.reservations.infra.adapter.in.web.dto.response.GetAvailableSeatsResponse;
 import com.roovies.concertreservation.reservations.infra.adapter.in.web.dto.response.GetReservationHistoryResponse;
 import io.swagger.v3.oas.annotations.Operation;
@@ -30,7 +32,6 @@ import org.springframework.web.bind.annotation.*;
 
 import java.time.LocalDate;
 import java.time.LocalDateTime;
-import java.util.Arrays;
 import java.util.List;
 
 @RestController
@@ -40,43 +41,7 @@ import java.util.List;
 public class ReservationController {
 
     private final GetAvailableSeatsUseCase getAvailableSeatsUseCase;
-
-    @Operation(
-            summary = "콘서트 예약 가능 일정 목록 조회",
-            description = "모든 사용자는 종료되지 않은 특정 콘서트의 예약 가능한 일정을 조회한다."
-    )
-    @ApiResponses(
-            value = {
-                    @ApiResponse(
-                            responseCode = "200",
-                            description = "예약 가능 일정 목록 조회 성공",
-                            content = @Content(schema = @Schema(implementation = GetAvailableSchedulesResponse.class))
-                    ),
-                    @ApiResponse(
-                            responseCode = "400",
-                            description = "잘못된 요청 데이터"
-                    ),
-                    @ApiResponse(
-                            responseCode = "404",
-                            description = "리소스를 찾을 수 없음"
-                    ),
-                    @ApiResponse(
-                            responseCode = "500",
-                            description = "서버 오류"
-                    )
-            }
-    )
-    @GetMapping("/{concertId}/available-schedules")
-    public ResponseEntity<GetAvailableSchedulesResponse> getAvailableSchedules(@PathVariable("concertId") final Long concertId) {
-        return ResponseEntity.status(HttpStatus.OK).body(
-                GetAvailableSchedulesResponse.builder()
-                        .concertId(10L)
-                        .availableDates(Arrays.asList(
-                            LocalDate.parse("2025-01-01"),
-                            LocalDate.parse("2025-01-02"),
-                            LocalDate.parse("2025-01-04")))
-                        .build());
-    }
+    private final HoldSeatUseCase holdSeatUseCase;
 
     @Operation(
             summary = "예약 가능 좌석 목록 조회",
@@ -128,6 +93,7 @@ public class ReservationController {
         return ResponseEntity.status(HttpStatus.OK).body(
                 GetAvailableSeatsResponse.builder()
                         .concertId(result.concertId())
+                        .concertScheduleId(result.concertScheduleId())
                         .date(result.date())
                         .availableSeats(availableSeats)
                         .isAllReserved(result.isAllReserved())
@@ -139,7 +105,7 @@ public class ReservationController {
             summary = "좌석 예약 신청",
             description = """
                         인증된 사용자가 콘서트의 특정 날짜와 좌석을 예약 신청한다.
-                        이 단계에서 결제는 이루어지지 않으며, 좌석은 30분 동안 선점된다.
+                        이 단계에서 결제는 이루어지지 않으며, 좌석은 15분 동안 선점된다.
                         """
     )
     @ApiResponses(
@@ -176,10 +142,14 @@ public class ReservationController {
             @AuthenticationPrincipal UserDetails userDetails, // TODO: Custom UserDetails 구현 필요
             @Valid @RequestBody CreateReservationRequest request
     ) {
+        // TODO: 스프링 시큐리티 구현 후 회원 ID 넘기도록 수정해야 함
+        HoldSeatCommand command = HoldSeatCommand.of(request.scheduleId(), request.seatIds(), 1L);
+        HoldSeatResult result = holdSeatUseCase.execute(command);
         return ResponseEntity.status(HttpStatus.CREATED).body(
                 CreateReservationResponse.builder()
-                        .reservationId(101L)
-                        .expiresAt(108_000L)
+                        .scheduleId(result.scheduleId())
+                        .seatIds(result.seatIds())
+                        .ttlSeconds(result.ttlSeconds())
                         .build()
         );
     }
