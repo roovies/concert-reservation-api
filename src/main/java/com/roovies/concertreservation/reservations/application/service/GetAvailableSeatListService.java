@@ -8,7 +8,7 @@ import com.roovies.concertreservation.reservations.application.port.out.Reservat
 import com.roovies.concertreservation.reservations.application.port.out.ReservationRepositoryPort;
 import com.roovies.concertreservation.reservations.domain.entity.Reservation;
 import com.roovies.concertreservation.reservations.domain.entity.ReservationDetail;
-import com.roovies.concertreservation.reservations.domain.enums.PaymentStatus;
+import com.roovies.concertreservation.reservations.domain.enums.ReservationStatus;
 import com.roovies.concertreservation.reservations.domain.vo.external.ReservationVenueSnapShot;
 import com.roovies.concertreservation.reservations.domain.vo.external.ReservationConcertScheduleSnapShot;
 import lombok.RequiredArgsConstructor;
@@ -63,8 +63,8 @@ public class GetAvailableSeatListService implements GetAvailableSeatsUseCase {
 
         // 3. 예약된 좌석 ID 추출
         Set<Long> reservedSeatIds = reservations.stream()
-                .filter(reservation -> reservation.getStatus() == PaymentStatus.HOLD
-                        || reservation.getStatus() == PaymentStatus.CONFIRMED)
+                .filter(reservation -> reservation.getStatus() == ReservationStatus.HOLD
+                        || reservation.getStatus() == ReservationStatus.CONFIRMED)
                 .flatMap(reservation -> reservation.getDetails().stream())
                 .filter(detail -> detail.getScheduleId().equals(schedule.id()))
                 .map(ReservationDetail::getSeatId)

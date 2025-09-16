@@ -52,7 +52,7 @@ public class ConcertRepositoryAdapter implements ConcertRepositoryPort {
                             scheduleEntity.getScheduleDate(),
                             scheduleEntity.getAvailableSeats(), // 총 좌석수는 임시로 설정 -> Application에서 orchestration을 통해 적재
                             scheduleEntity.getAvailableSeats(),
-                            scheduleEntity.getReservationStatus(),
+                            scheduleEntity.getScheduleStatus(),
                             scheduleEntity.getVenue().getId()
                     ))
                     .toList();

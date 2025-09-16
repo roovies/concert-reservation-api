@@ -1,6 +1,6 @@
 package com.roovies.concertreservation.concerts.domain.entity;
 
-import com.roovies.concertreservation.concerts.domain.enums.ReservationStatus;
+import com.roovies.concertreservation.concerts.domain.enums.ScheduleStatus;
 import lombok.Getter;
 
 import java.time.LocalDate;
@@ -12,7 +12,7 @@ public class ConcertSchedule {
     private final LocalDate date;
     private final int totalSeats;
     private int availableSeats;
-    private ReservationStatus reservationStatus;
+    private ScheduleStatus scheduleStatus;
 
     // 다른 Aggregate Root 참조
     private final Long venueId;
@@ -21,16 +21,16 @@ public class ConcertSchedule {
             Long id, Long concertId,
             LocalDate scheduleDate,
             int totalSeats, int availableSeats,
-            ReservationStatus reservationStatus, Long venueId
+            ScheduleStatus scheduleStatus, Long venueId
     ) {
-        return new ConcertSchedule(id, concertId, scheduleDate, totalSeats, availableSeats, reservationStatus, venueId);
+        return new ConcertSchedule(id, concertId, scheduleDate, totalSeats, availableSeats, scheduleStatus, venueId);
     }
 
     private ConcertSchedule(
             Long id, Long concertId,
             LocalDate date,
             int totalSeats, int availableSeats,
-            ReservationStatus reservationStatus, Long venueId
+            ScheduleStatus scheduleStatus, Long venueId
     ) {
         // availableSeats > totalSeats인지 검증
         if (availableSeats > totalSeats)
@@ -41,7 +41,7 @@ public class ConcertSchedule {
         this.date = date;
         this.totalSeats = totalSeats;
         this.availableSeats = availableSeats;
-        this.reservationStatus = reservationStatus;
+        this.scheduleStatus = scheduleStatus;
         this.venueId = venueId;
     }
 
@@ -51,7 +51,7 @@ public class ConcertSchedule {
             throw new IllegalArgumentException("잔여 좌석의 수보다 예약하는 좌석의 수가 더 클 수 없습니다.");
 
         if (decreased == 0)
-            this.reservationStatus = ReservationStatus.SOLD_OUT;
+            this.scheduleStatus = ScheduleStatus.SOLD_OUT;
 
         availableSeats = decreased;
         return availableSeats;

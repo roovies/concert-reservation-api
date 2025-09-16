@@ -6,7 +6,7 @@ import com.roovies.concertreservation.concerts.application.service.GetConcertByI
 import com.roovies.concertreservation.concerts.application.port.out.ConcertRepositoryPort;
 import com.roovies.concertreservation.concerts.domain.entity.Concert;
 import com.roovies.concertreservation.concerts.domain.entity.ConcertSchedule;
-import com.roovies.concertreservation.concerts.domain.enums.ReservationStatus;
+import com.roovies.concertreservation.concerts.domain.enums.ScheduleStatus;
 import com.roovies.concertreservation.concerts.domain.vo.external.ConcertVenueSnapShot;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -98,9 +98,9 @@ public class GetConcertByIdUseCaseTest {
         );
 
         List<ConcertSchedule> schedules = new ArrayList<>(Arrays.asList(
-                ConcertSchedule.create(1L, 1L, LocalDate.of(2025, 9, 1), 100, 100, ReservationStatus.AVAILABLE, 5L),
-                ConcertSchedule.create(1L, 1L, LocalDate.of(2025, 9, 2), 100, 100, ReservationStatus.AVAILABLE, 5L),
-                ConcertSchedule.create(1L, 1L, LocalDate.of(2025, 9, 3), 100, 100, ReservationStatus.AVAILABLE, 5L)
+                ConcertSchedule.create(1L, 1L, LocalDate.of(2025, 9, 1), 100, 100, ScheduleStatus.AVAILABLE, 5L),
+                ConcertSchedule.create(1L, 1L, LocalDate.of(2025, 9, 2), 100, 100, ScheduleStatus.AVAILABLE, 5L),
+                ConcertSchedule.create(1L, 1L, LocalDate.of(2025, 9, 3), 100, 100, ScheduleStatus.AVAILABLE, 5L)
         ));
         concert.setSchedules(schedules);
 

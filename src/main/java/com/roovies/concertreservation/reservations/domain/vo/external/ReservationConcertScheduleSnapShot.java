@@ -1,6 +1,6 @@
 package com.roovies.concertreservation.reservations.domain.vo.external;
 
-import com.roovies.concertreservation.concerts.domain.enums.ReservationStatus;
+import com.roovies.concertreservation.concerts.domain.enums.ScheduleStatus;
 import lombok.Builder;
 
 import java.time.LocalDate;
@@ -10,11 +10,11 @@ public record ReservationConcertScheduleSnapShot(
         Long id,
         LocalDate date,
         int availableSeats,
-        ReservationStatus status,
+        ScheduleStatus status,
         Long venueId
 ) {
 
     public boolean isSoldOut() {
-        return availableSeats == 0 || status.equals(ReservationStatus.SOLD_OUT);
+        return availableSeats == 0 || status.equals(ScheduleStatus.SOLD_OUT);
     }
 }

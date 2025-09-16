@@ -1,7 +1,7 @@
 package com.roovies.concertreservation.reservations.application;
 
+import com.roovies.concertreservation.concerts.domain.enums.ScheduleStatus;
 import com.roovies.concertreservation.venues.domain.enums.SeatType;
-import com.roovies.concertreservation.concerts.domain.enums.ReservationStatus;
 import com.roovies.concertreservation.reservations.application.dto.query.GetAvailableSeatsQuery;
 import com.roovies.concertreservation.reservations.application.dto.result.GetAvailableSeatListResult;
 import com.roovies.concertreservation.reservations.application.port.out.ReservationVenueQueryPort;
@@ -10,7 +10,7 @@ import com.roovies.concertreservation.reservations.application.port.out.Reservat
 import com.roovies.concertreservation.reservations.application.service.GetAvailableSeatListService;
 import com.roovies.concertreservation.reservations.domain.entity.Reservation;
 import com.roovies.concertreservation.reservations.domain.entity.ReservationDetail;
-import com.roovies.concertreservation.reservations.domain.enums.PaymentStatus;
+import com.roovies.concertreservation.reservations.domain.enums.ReservationStatus;
 import com.roovies.concertreservation.reservations.domain.vo.external.ReservationVenueSnapShot;
 import com.roovies.concertreservation.reservations.domain.vo.external.ReservationConcertScheduleSnapShot;
 import org.junit.jupiter.api.Test;
@@ -72,7 +72,7 @@ public class GetAvailableSeatsUseCaseTest {
                 .id(5L)
                 .date(date)
                 .availableSeats(0)
-                .status(ReservationStatus.AVAILABLE)
+                .status(ScheduleStatus.AVAILABLE)
                 .venueId(10L)
                 .build();
         given(reservationConcertQueryPort.findConcertSchedule(query.concertId(), query.date()))
@@ -104,7 +104,7 @@ public class GetAvailableSeatsUseCaseTest {
                 .id(5L)
                 .date(date)
                 .availableSeats(50)
-                .status(ReservationStatus.SOLD_OUT)
+                .status(ScheduleStatus.SOLD_OUT)
                 .venueId(10L)
                 .build();
         given(reservationConcertQueryPort.findConcertSchedule(query.concertId(), query.date()))
@@ -135,7 +135,7 @@ public class GetAvailableSeatsUseCaseTest {
                 .id(5L)
                 .date(date)
                 .availableSeats(3)
-                .status(ReservationStatus.AVAILABLE)
+                .status(ScheduleStatus.AVAILABLE)
                 .venueId(10L)
                 .build();
         given(reservationConcertQueryPort.findConcertSchedule(query.concertId(), query.date()))
@@ -197,7 +197,7 @@ public class GetAvailableSeatsUseCaseTest {
                 .id(5L)
                 .date(date)
                 .availableSeats(3)
-                .status(ReservationStatus.AVAILABLE)
+                .status(ScheduleStatus.AVAILABLE)
                 .venueId(10L)
                 .build();
         given(reservationConcertQueryPort.findConcertSchedule(query.concertId(), query.date()))
@@ -235,7 +235,7 @@ public class GetAvailableSeatsUseCaseTest {
                 ReservationDetail.create(1L, 100L, 5L, 1L)
         );
         List<Reservation> reservations = List.of(
-                Reservation.create(100L, 1000L, PaymentStatus.CONFIRMED,
+                Reservation.create(100L, 1000L, ReservationStatus.CONFIRMED,
                         LocalDateTime.now(), LocalDateTime.now(), reservationDetails)
         );
         given(reservationRepositoryPort.findReservationsByDetailScheduleId(schedule.id()))

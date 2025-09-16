@@ -1,7 +1,7 @@
 package com.roovies.concertreservation.concerts.infra.adapter.out.persistence.entity;
 
 import com.roovies.concertreservation.venues.infra.adapter.out.persistence.entity.VenueJpaEntity;
-import com.roovies.concertreservation.concerts.domain.enums.ReservationStatus;
+import com.roovies.concertreservation.concerts.domain.enums.ScheduleStatus;
 import jakarta.persistence.*;
 import lombok.AccessLevel;
 import lombok.Getter;
@@ -34,8 +34,8 @@ public class ConcertScheduleJpaEntity {
     private int availableSeats;
 
     @Enumerated(EnumType.STRING)
-    @Column(name = "reservation_status", nullable = false)
-    private ReservationStatus reservationStatus;
+    @Column(name = "schedule_status", nullable = false)
+    private ScheduleStatus scheduleStatus;
 
     @Column(name = "created_at", nullable = false, updatable = false)
     private LocalDateTime createdAt;

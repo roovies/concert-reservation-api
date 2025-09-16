@@ -1,6 +1,6 @@
 package com.roovies.concertreservation.payments.infra.adapter.in.web.dto.response;
 
-import com.roovies.concertreservation.payments.infra.adapter.in.web.dto.enums.PaymentStatus;
+import com.roovies.concertreservation.payments.domain.enums.PaymentStatus;
 import io.swagger.v3.oas.annotations.media.Schema;
 import lombok.Builder;
 

@@ -1,6 +1,6 @@
 package com.roovies.concertreservation.reservations.infra.adapter.out.persistence.entity;
 
-import com.roovies.concertreservation.reservations.domain.enums.PaymentStatus;
+import com.roovies.concertreservation.reservations.domain.enums.ReservationStatus;
 import com.roovies.concertreservation.users.infra.adapter.out.persistence.entity.UserJpaEntity;
 import jakarta.persistence.*;
 import lombok.AccessLevel;
@@ -26,7 +26,7 @@ public class ReservationJpaEntity {
 
     @Enumerated(EnumType.STRING)
     @Column(name = "status", nullable = false, length = 20)
-    private PaymentStatus status;  // HOLD/CONFIRMED/CANCELLED/REFUNDED
+    private ReservationStatus status;  // HOLD/CONFIRMED/CANCELLED/REFUNDED
 
 
     @Column(name = "created_at", nullable = false, updatable = false)

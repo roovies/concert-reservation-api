@@ -1,6 +1,6 @@
 package com.roovies.concertreservation.payments.infra.adapter.out.persistence.entity;
 
-import com.roovies.concertreservation.payments.infra.adapter.in.web.dto.enums.PaymentStatus;
+import com.roovies.concertreservation.payments.domain.enums.PaymentStatus;
 import com.roovies.concertreservation.reservations.infra.adapter.out.persistence.entity.ReservationJpaEntity;
 import jakarta.persistence.*;
 import lombok.Getter;
@@ -22,7 +22,7 @@ public class PaymentJpaEntity {
 
     // 결제 금액
     @Column(name = "amount", nullable = false)
-    private Integer amount;
+    private Long amount;
 
     @Enumerated(EnumType.STRING)
     @Column(name = "status", nullable = false, length = 20)

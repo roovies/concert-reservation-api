@@ -1,6 +1,6 @@
 package com.roovies.concertreservation.payments.infra.adapter.in.web.controller;
 
-import com.roovies.concertreservation.payments.infra.adapter.in.web.dto.enums.PaymentStatus;
+import com.roovies.concertreservation.payments.domain.enums.PaymentStatus;
 import com.roovies.concertreservation.payments.infra.adapter.in.web.dto.request.CancelPaymentRequest;
 import com.roovies.concertreservation.payments.infra.adapter.in.web.dto.request.CreatePaymentRequest;
 import com.roovies.concertreservation.payments.infra.adapter.in.web.dto.response.CancelPaymentResponse;
@@ -74,7 +74,7 @@ public class PaymentController {
                 CreatePaymentResponse.builder()
                         .paymentId(1L)
                         .amount(BigDecimal.valueOf(120000))
-                        .status(PaymentStatus.CONFIRMED)
+                        .status(PaymentStatus.SUCCESS)
                         .build()
         );
     }

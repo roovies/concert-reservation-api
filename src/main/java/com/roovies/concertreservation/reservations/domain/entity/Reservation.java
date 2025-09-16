@@ -1,6 +1,6 @@
 package com.roovies.concertreservation.reservations.domain.entity;
 
-import com.roovies.concertreservation.reservations.domain.enums.PaymentStatus;
+import com.roovies.concertreservation.reservations.domain.enums.ReservationStatus;
 import lombok.Getter;
 
 import java.time.LocalDateTime;
@@ -15,18 +15,18 @@ public class Reservation {
     // 기본 정보
     private final Long id;
     private final Long userId;
-    private PaymentStatus status;
+    private ReservationStatus status;
     private final LocalDateTime createdAt;
     private LocalDateTime updatedAt;
 
     // Child Entity
     private final List<ReservationDetail> details;
 
-    public static Reservation create(Long id, Long userId, PaymentStatus status, LocalDateTime createdAt, LocalDateTime updatedAt, List<ReservationDetail> details) {
+    public static Reservation create(Long id, Long userId, ReservationStatus status, LocalDateTime createdAt, LocalDateTime updatedAt, List<ReservationDetail> details) {
         return new Reservation(id, userId, status, createdAt, updatedAt, details);
     }
 
-    private Reservation(Long id, Long userId, PaymentStatus status, LocalDateTime createdAt, LocalDateTime updatedAt, List<ReservationDetail> details) {
+    private Reservation(Long id, Long userId, ReservationStatus status, LocalDateTime createdAt, LocalDateTime updatedAt, List<ReservationDetail> details) {
         this.id = id;
         this.userId = userId;
         this.status = status;

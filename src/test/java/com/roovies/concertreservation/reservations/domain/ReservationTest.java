@@ -2,7 +2,7 @@ package com.roovies.concertreservation.reservations.domain;
 
 import com.roovies.concertreservation.reservations.domain.entity.Reservation;
 import com.roovies.concertreservation.reservations.domain.entity.ReservationDetail;
-import com.roovies.concertreservation.reservations.domain.enums.PaymentStatus;
+import com.roovies.concertreservation.reservations.domain.enums.ReservationStatus;
 import org.junit.jupiter.api.Test;
 
 import java.time.LocalDateTime;
@@ -22,7 +22,7 @@ public class ReservationTest {
         assertThatThrownBy(() -> Reservation.create(
                 1L,
                 5L,
-                PaymentStatus.HOLD,
+                ReservationStatus.HOLD,
                 LocalDateTime.of(2025, 9, 9, 15, 26),
                 null,
                 details
@@ -40,7 +40,7 @@ public class ReservationTest {
         assertThatThrownBy(() -> Reservation.create(
                 1L,
                 5L,
-                PaymentStatus.HOLD,
+                ReservationStatus.HOLD,
                 LocalDateTime.of(2025, 9, 9, 15, 26),
                 null,
                 details
@@ -64,7 +64,7 @@ public class ReservationTest {
         Reservation reservation = Reservation.create(
                 1L,
                 5L,
-                PaymentStatus.HOLD,
+                ReservationStatus.HOLD,
                 LocalDateTime.of(2025, 9, 9, 15, 26),
                 null,
                 details
@@ -72,7 +72,7 @@ public class ReservationTest {
 
         // then
         assertThat(reservation.getStatus())
-                .isEqualTo(PaymentStatus.HOLD);
+                .isEqualTo(ReservationStatus.HOLD);
         assertThat(reservation.getUpdatedAt())
                 .isNull();
     }
@@ -99,7 +99,7 @@ public class ReservationTest {
         assertThatThrownBy(() -> Reservation.create(
                 10L,
                 5L,
-                PaymentStatus.HOLD,
+                ReservationStatus.HOLD,
                 LocalDateTime.of(2025, 9, 9, 15, 26),
                 null,
                 details
@@ -122,7 +122,7 @@ public class ReservationTest {
         Reservation reservation = Reservation.create(
                 5L,
                 1L,
-                PaymentStatus.HOLD,
+                ReservationStatus.HOLD,
                 LocalDateTime.of(2025, 9, 9, 15, 26),
                 null,
                 details
@@ -163,7 +163,7 @@ public class ReservationTest {
         assertThatThrownBy(() -> Reservation.create(
                 5L,
                 1L,
-                PaymentStatus.HOLD,
+                ReservationStatus.HOLD,
                 LocalDateTime.of(2025, 9, 9, 15, 26),
                 null,
                 details

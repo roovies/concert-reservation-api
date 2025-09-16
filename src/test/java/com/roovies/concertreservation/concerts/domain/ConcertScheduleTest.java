@@ -1,7 +1,7 @@
 package com.roovies.concertreservation.concerts.domain;
 
 import com.roovies.concertreservation.concerts.domain.entity.ConcertSchedule;
-import com.roovies.concertreservation.concerts.domain.enums.ReservationStatus;
+import com.roovies.concertreservation.concerts.domain.enums.ScheduleStatus;
 import org.junit.jupiter.api.Test;
 
 import java.time.LocalDate;
@@ -18,11 +18,11 @@ public class ConcertScheduleTest {
         LocalDate date = LocalDate.of(2025, 9, 7);
         int totalSeats = 100;
         int availableSeats = 100;
-        ReservationStatus reservationStatus = ReservationStatus.AVAILABLE;
+        ScheduleStatus scheduleStatus = ScheduleStatus.AVAILABLE;
         Long venueId = 10L;
 
         // when
-        ConcertSchedule schedule = ConcertSchedule.create(scheduleId, concertId, date, totalSeats, availableSeats, reservationStatus, venueId);
+        ConcertSchedule schedule = ConcertSchedule.create(scheduleId, concertId, date, totalSeats, availableSeats, scheduleStatus, venueId);
 
         // then
         assertThat(schedule.getId()).isEqualTo(scheduleId);
@@ -40,11 +40,11 @@ public class ConcertScheduleTest {
         LocalDate date = LocalDate.of(2025, 9, 7);
         int totalSeats = 100;
         int availableSeats = 100;
-        ReservationStatus reservationStatus = ReservationStatus.AVAILABLE;
+        ScheduleStatus scheduleStatus = ScheduleStatus.AVAILABLE;
         Long venueId = 10L;
 
         // when
-        ConcertSchedule schedule = ConcertSchedule.create(scheduleId, concertId, date, totalSeats, availableSeats, reservationStatus, venueId);
+        ConcertSchedule schedule = ConcertSchedule.create(scheduleId, concertId, date, totalSeats, availableSeats, scheduleStatus, venueId);
 
         // then
         assertThat(schedule.getAvailableSeats()).isEqualTo(totalSeats);
@@ -58,11 +58,11 @@ public class ConcertScheduleTest {
         LocalDate date = LocalDate.of(2025, 9, 7);
         int totalSeats = 100;
         int availableSeats = 101;
-        ReservationStatus reservationStatus = ReservationStatus.AVAILABLE;
+        ScheduleStatus scheduleStatus = ScheduleStatus.AVAILABLE;
         Long venueId = 10L;
 
         // when & then
-        assertThatThrownBy(() -> ConcertSchedule.create(scheduleId, concertId, date, totalSeats, availableSeats, reservationStatus, venueId))
+        assertThatThrownBy(() -> ConcertSchedule.create(scheduleId, concertId, date, totalSeats, availableSeats, scheduleStatus, venueId))
                 .isInstanceOf(IllegalArgumentException.class)
                 .hasMessage("예약 가능한 좌석의 수는 전체 좌석 수보다 많을 수 없습니다.");
     }
@@ -71,7 +71,7 @@ public class ConcertScheduleTest {
     void 스케줄의_예약_가능한_좌석의_수를_감소시킬_수_있다() {
         // given
         ConcertSchedule schedule = ConcertSchedule.create(
-                1L, 1L, LocalDate.of(2025, 9, 7), 100, 100, ReservationStatus.AVAILABLE, 10L
+                1L, 1L, LocalDate.of(2025, 9, 7), 100, 100, ScheduleStatus.AVAILABLE, 10L
         );
 
         // when
@@ -86,7 +86,7 @@ public class ConcertScheduleTest {
     void 예약_가능한_좌석의_수를_감소시켰을_때_결과값이_0보다_작을_경우_예외가_발생해야_한다() {
         // given
         ConcertSchedule schedule = ConcertSchedule.create(
-                1L, 1L, LocalDate.of(2025, 9, 7), 100, 1, ReservationStatus.AVAILABLE, 10L
+                1L, 1L, LocalDate.of(2025, 9, 7), 100, 1, ScheduleStatus.AVAILABLE, 10L
         );
 
         // when & then
@@ -99,7 +99,7 @@ public class ConcertScheduleTest {
     void 예약_가능한_좌석의_수를_감소시켰을_때_결과값이_0인_경우_예약_상태는_SOLD_OUT이어야_한다() {
         // given
         ConcertSchedule schedule = ConcertSchedule.create(
-                1L, 1L, LocalDate.of(2025, 9, 7), 100, 1, ReservationStatus.AVAILABLE, 10L
+                1L, 1L, LocalDate.of(2025, 9, 7), 100, 1, ScheduleStatus.AVAILABLE, 10L
         );
 
         // when
@@ -107,6 +107,6 @@ public class ConcertScheduleTest {
 
         // then
         assertThat(availableSeats).isEqualTo(0);
-        assertThat(schedule.getReservationStatus()).isEqualTo(ReservationStatus.SOLD_OUT);
+        assertThat(schedule.getScheduleStatus()).isEqualTo(ScheduleStatus.SOLD_OUT);
     }
 }
