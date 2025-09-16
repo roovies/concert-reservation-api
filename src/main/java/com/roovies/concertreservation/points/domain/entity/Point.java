@@ -31,6 +31,7 @@ public class Point {
         if (other.value() % 100 != 0)
             throw new IllegalArgumentException("포인트는 100원 단위로만 충전할 수 있습니다.");
         this.amount = this.amount.add(other);
+        this.updatedAt = LocalDateTime.now();
     }
 
     public void use(Amount other) {

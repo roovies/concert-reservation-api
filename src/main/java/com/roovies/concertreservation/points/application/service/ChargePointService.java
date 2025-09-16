@@ -4,8 +4,7 @@ import com.roovies.concertreservation.points.application.dto.command.ChargePoint
 import com.roovies.concertreservation.points.application.dto.result.ChargePointResult;
 import com.roovies.concertreservation.points.application.port.in.ChargePointUseCase;
 import com.roovies.concertreservation.points.application.port.out.PointRepositoryPort;
-import com.roovies.concertreservation.points.application.port.out.PointUserQueryPort;
-import com.roovies.concertreservation.points.domain.vo.external.PointUserSnapShot;
+import com.roovies.concertreservation.points.domain.entity.Point;
 import com.roovies.concertreservation.shared.domain.vo.Amount;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
@@ -17,16 +16,22 @@ import java.util.NoSuchElementException;
 public class ChargePointService implements ChargePointUseCase {
 
     private final PointRepositoryPort pointRepositoryPort;
-    private final PointUserQueryPort pointUserQueryPort;
 
     @Override
     public ChargePointResult excute(ChargePointCommand command) {
         Long userId = command.userId();
-        Amount amount = Amount.of(command.amount());
+        Amount chargeAmount = Amount.of(command.amount());
 
-        PointUserSnapShot userSnapShot = pointUserQueryPort.getUser(userId)
+        Point point = pointRepositoryPort.findById(userId)
                 .orElseThrow(() -> new NoSuchElementException("존재하지 않는 회원입니다."));
 
-        return null;
+        point.charge(chargeAmount);
+
+        Point result = pointRepositoryPort.save(point);
+        return ChargePointResult.of(
+                result.getUserId(),
+                result.getAmount().value(),
+                result.getUpdatedAt()
+        );
     }
 }

@@ -1,8 +1,8 @@
 package com.roovies.concertreservation.points.application;
 
 import com.roovies.concertreservation.points.application.dto.command.ChargePointCommand;
+import com.roovies.concertreservation.points.application.dto.result.ChargePointResult;
 import com.roovies.concertreservation.points.application.port.out.PointRepositoryPort;
-import com.roovies.concertreservation.points.application.port.out.PointUserQueryPort;
 import com.roovies.concertreservation.points.application.service.ChargePointService;
 import com.roovies.concertreservation.points.domain.entity.Point;
 import com.roovies.concertreservation.shared.domain.vo.Amount;
@@ -13,6 +13,7 @@ import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 
+import java.time.LocalDateTime;
 import java.util.NoSuchElementException;
 import java.util.Optional;
 
@@ -21,9 +22,6 @@ import static org.mockito.BDDMockito.*;
 
 @ExtendWith(MockitoExtension.class)
 public class ChargePointServiceTest {
-
-    @Mock
-    private PointUserQueryPort pointUserQueryPort;
 
     @Mock
     private PointRepositoryPort pointRepositoryPort;
@@ -41,7 +39,7 @@ public class ChargePointServiceTest {
     @Test
     void 존재하지_않는_회원일_경우_예외가_발생해야_한다() {
         // given
-        given(pointUserQueryPort.getUser(command.userId()))
+        given(pointRepositoryPort.findById(command.userId()))
                 .willReturn(Optional.empty());
 
         // when & then
@@ -51,18 +49,23 @@ public class ChargePointServiceTest {
     }
 
     @Test
-    void
-
-    @Test
-    void 정상적인_포인트_충전_요청시_성공해야_한다() {
+    void 보유_포인트가_0일_때_포인트_충전_시_결과는_충전금액이어야_한다() {
         // given
-        Point point = Point.create(1L, Amount.of(0), null);
-        given(pointRepositoryPort.findById(1L))
-                .willReturn(Optional.of(point));
+        Point storedPoint = Point.create(command.userId(), Amount.of(0), null);
+        given(pointRepositoryPort.findById(command.userId()))
+                .willReturn(Optional.of(storedPoint));
+
+        Point resultPoint = Point.create(command.userId(), Amount.of(command.amount()), LocalDateTime.of(2025, 9, 16, 17, 30));
+        given(pointRepositoryPort.save(storedPoint))
+                .willReturn(resultPoint);
 
         // when
+        ChargePointResult result = chargePointService.excute(command);
 
-
-
+        // then
+        assertThat(result).isNotNull();
+        assertThat(result.userId()).isEqualTo(command.userId());
+        assertThat(result.totalAmount()).isEqualTo(command.amount());
+        assertThat(result.updatedAt()).isNotNull();
     }
 }

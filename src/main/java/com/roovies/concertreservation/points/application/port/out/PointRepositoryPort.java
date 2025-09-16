@@ -6,5 +6,5 @@ import java.util.Optional;
 
 public interface PointRepositoryPort {
     Optional<Point> findById(Long userId);
-    void save(Point point);
+    Point save(Point point);
 }
