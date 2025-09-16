@@ -1,8 +1,13 @@
 spring:
+  config:
+    activate:
+      on-profile: test
   datasource:
     # H2 메모리 DB 사용, MySQL 호환 모드
     url: jdbc:h2:mem:testdb;MODE=MySQL
     # H2 JDBC 드라이버 지정
+    username: sa
+    password:
     driver-class-name: org.h2.Driver
   jpa:
     hibernate:

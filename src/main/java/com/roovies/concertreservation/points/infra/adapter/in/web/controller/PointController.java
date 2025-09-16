@@ -1,6 +1,10 @@
 package com.roovies.concertreservation.points.infra.adapter.in.web.controller;
 
+import com.roovies.concertreservation.points.application.dto.command.ChargePointCommand;
+import com.roovies.concertreservation.points.application.dto.result.ChargePointResult;
+import com.roovies.concertreservation.points.application.port.in.ChargePointUseCase;
 import com.roovies.concertreservation.points.infra.adapter.in.web.dto.request.GetPointHistoryRequest;
+import com.roovies.concertreservation.points.infra.adapter.in.web.dto.request.UpdatePointRequest;
 import com.roovies.concertreservation.points.infra.adapter.in.web.dto.response.GetPointHistoryResponse;
 import com.roovies.concertreservation.points.infra.adapter.in.web.dto.response.GetPointResponse;
 import com.roovies.concertreservation.points.infra.adapter.in.web.dto.response.UpdatePointResponse;
@@ -31,6 +35,8 @@ import java.util.List;
 @Tag(name = "Point API", description = "포인트 관련 기능 명세서")
 @SecurityRequirement(name = "bearerAuth")  // Swagger UI에 자물쇠 표시
 public class PointController {
+
+    private final ChargePointUseCase chargePointUseCase;
 
     @Operation(
             summary = "포인트 조회",
@@ -65,7 +71,7 @@ public class PointController {
             @Parameter(name = "Authorization", in = ParameterIn.HEADER, required = true, example = "Bearer {token}")
     })
     @GetMapping
-    public ResponseEntity<GetPointResponse> getBalance(@AuthenticationPrincipal UserDetails userDetails) { // TODO: Custom User Details 구현 필요
+    public ResponseEntity<GetPointResponse> getPoint(@AuthenticationPrincipal UserDetails userDetails) { // TODO: Custom User Details 구현 필요
         return ResponseEntity.status(HttpStatus.CREATED).body(
                 GetPointResponse.builder()
                         .point(100000L)
@@ -107,11 +113,17 @@ public class PointController {
             @Parameter(name = "Authorization", in = ParameterIn.HEADER, required = true, example = "Bearer {token}")
     })
     @PostMapping("/charge")
-    public ResponseEntity<UpdatePointResponse> updateBalance(@AuthenticationPrincipal UserDetails userDetails) { // TODO: Custom User Details 구현 필요
+    public ResponseEntity<UpdatePointResponse> updatePoint(
+            @AuthenticationPrincipal UserDetails userDetails, // TODO: Custom User Details 구현 필요
+            @Valid @RequestBody UpdatePointRequest request
+    ) {
+        ChargePointCommand command = ChargePointCommand.of(1L, request.amount());
+        ChargePointResult result = chargePointUseCase.execute(command);
         return ResponseEntity.status(HttpStatus.CREATED).body(
                 UpdatePointResponse.builder()
-                        .point(100000L)
-                        .responseTime(LocalDateTime.now())
+                        .userId(result.userId())
+                        .point(result.totalAmount())
+                        .responseTime(result.updatedAt())
                         .build()
         );
     }
@@ -149,7 +161,7 @@ public class PointController {
             @Parameter(name = "Authorization", in = ParameterIn.HEADER, required = true, example = "Bearer {token}")
     })
     @GetMapping("/history")
-    public ResponseEntity<GetPointHistoryResponse> getBalanceHistory(
+    public ResponseEntity<GetPointHistoryResponse> getPointHistory(
             @AuthenticationPrincipal UserDetails userDetails, // TODO: Custom User Details 구현 필요
             @Valid @RequestBody GetPointHistoryRequest request
     ) {

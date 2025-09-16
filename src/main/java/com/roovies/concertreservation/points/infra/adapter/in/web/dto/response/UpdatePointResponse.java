@@ -8,6 +8,9 @@ import java.time.LocalDateTime;
 @Builder
 @Schema(description = "포인트 충전 응답 DTO")
 public record UpdatePointResponse(
+        @Schema(description = "회원 ID", example = "1")
+        Long userId,
+
         @Schema(description = "충전 후 포인트", example = "20000")
         Long point,
 
