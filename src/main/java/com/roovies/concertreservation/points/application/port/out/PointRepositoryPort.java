@@ -7,4 +7,5 @@ import java.util.Optional;
 public interface PointRepositoryPort {
     Optional<Point> findById(Long userId);
     Point save(Point point);
+    void deleteAll();
 }

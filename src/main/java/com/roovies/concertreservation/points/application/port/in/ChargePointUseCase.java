@@ -4,6 +4,5 @@ import com.roovies.concertreservation.points.application.dto.command.ChargePoint
 import com.roovies.concertreservation.points.application.dto.result.ChargePointResult;
 
 public interface ChargePointUseCase {
-    ChargePointResult excute(ChargePointCommand command);
-
+    ChargePointResult execute(ChargePointCommand command);
 }

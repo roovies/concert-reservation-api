@@ -18,13 +18,11 @@ public class PointJpaEntity {
     @Column(name = "user_id")
     private Long userId;
 
-    @OneToOne(fetch = FetchType.LAZY)
-    @MapsId // userId를 PK이자 FK로 사용
-    @JoinColumn(name = "user_id")
-    private UserJpaEntity user;
-
     @Column(nullable = false)
     private Long amount;
+
+    @Version
+    private Long version;
 
     @Column(name = "updated_at")
     private LocalDateTime updatedAt;
@@ -39,6 +37,11 @@ public class PointJpaEntity {
 
     private PointJpaEntity(Long userId, Long amount, LocalDateTime updatedAt) {
         this.userId = userId;
+        this.amount = amount;
+        this.updatedAt = updatedAt;
+    }
+
+    public void updateAmount(Long amount, LocalDateTime updatedAt) {
         this.amount = amount;
         this.updatedAt = updatedAt;
     }

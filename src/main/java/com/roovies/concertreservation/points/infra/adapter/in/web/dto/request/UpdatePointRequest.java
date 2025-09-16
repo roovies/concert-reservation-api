@@ -7,6 +7,6 @@ import jakarta.validation.constraints.NotNull;
 public record UpdatePointRequest(
         @Schema(description = "충전 금액", example = "10000")
         @NotNull(message = "충전 금액은 필수입니다.")
-        Long point
+        Long amount
 ) {
 }

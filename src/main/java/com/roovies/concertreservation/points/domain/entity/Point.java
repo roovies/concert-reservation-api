@@ -10,12 +10,21 @@ public class Point {
     private Long userId;
     private Amount amount;
     private LocalDateTime updatedAt;
+    private final Long version;
 
     public static Point create(Long userId, Amount amount, LocalDateTime updatedAt) {
         return new Point(userId, amount, updatedAt);
     }
 
+    public static Point createWithVersion(Long userId, Amount amount, LocalDateTime updatedAt, Long version) {
+        return new Point(userId, amount, updatedAt, version);
+    }
+
     private Point(Long userId, Amount amount, LocalDateTime updatedAt) {
+        this(userId, amount, updatedAt, null);
+    }
+
+    private Point(Long userId, Amount amount, LocalDateTime updatedAt, Long version) {
         if (userId == null)
             throw new IllegalArgumentException("userId는 null일 수 없습니다.");
 
@@ -25,6 +34,7 @@ public class Point {
         this.userId = userId;
         this.amount = amount;
         this.updatedAt = updatedAt;
+        this.version = version;
     }
 
     public void charge(Amount other) {
