@@ -15,7 +15,6 @@ import org.mockito.junit.jupiter.MockitoExtension;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
-import java.util.Optional;
 import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.atomic.AtomicInteger;
 import java.util.stream.IntStream;
@@ -55,8 +54,8 @@ HoldSeatUseCaseTest {
         long expectedTTL = 300L;
 
         // 멱등성 정보가 없음
-        given(holdSeatIdempotencyCachePort.findByIdempotencyKey(command.idempotencyKey()))
-                .willReturn(Optional.empty());
+        given(holdSeatIdempotencyCachePort.tryProcess(anyString()))
+                .willReturn(true);
 
         // 현재 홀딩된 정보가 없음
         given(holdSeatCachePort.validateHoldSeatList(scheduleId, seatIds, userId))
@@ -81,6 +80,7 @@ HoldSeatUseCaseTest {
     void 좌석_목록이_null이면_예외가_발생해야_한다() {
         // given
         HoldSeatCommand nullSeatIdsCommand = new HoldSeatCommand("idempotencyKey", scheduleId, null, userId);
+        given(holdSeatIdempotencyCachePort.tryProcess(anyString())).willReturn(true);
 
         // when & then
         assertThatThrownBy(() -> holdSeatService.execute(nullSeatIdsCommand))
@@ -92,6 +92,7 @@ HoldSeatUseCaseTest {
     void 좌석_목록이_비어있을_때_예외가_발생해야_한다() {
         // given
         HoldSeatCommand nullSeatIdsCommand = new HoldSeatCommand("idempotencyKey", scheduleId, new ArrayList<>(), userId);
+        given(holdSeatIdempotencyCachePort.tryProcess(anyString())).willReturn(true);
 
         // when & then
         assertThatThrownBy(() -> holdSeatService.execute(nullSeatIdsCommand))
@@ -107,6 +108,8 @@ HoldSeatUseCaseTest {
         HoldSeatCommand duplicateCommand = new HoldSeatCommand("idempotencyKey", scheduleId, duplicateSeatIds, userId);
 
         long expectedTTL = 300L;
+        given(holdSeatIdempotencyCachePort.tryProcess(anyString()))
+                .willReturn(true);
         given(holdSeatCachePort.validateHoldSeatList(scheduleId, uniqueSeatIds, userId))
                 .willReturn(false);
         given(holdSeatCachePort.holdSeatList(scheduleId, uniqueSeatIds, userId))
@@ -125,6 +128,8 @@ HoldSeatUseCaseTest {
     void 동일한_요청을_재시도할_경우_기존_결과를_반환한다() {
         // given
         long expectedTTL = 300L;
+        given(holdSeatIdempotencyCachePort.tryProcess(anyString()))
+                .willReturn(true);
         given(holdSeatCachePort.validateHoldSeatList(scheduleId, seatIds, userId))
                 .willReturn(true);
         given(holdSeatCachePort.getHoldTTLSeconds(scheduleId, seatIds, userId))
@@ -141,6 +146,8 @@ HoldSeatUseCaseTest {
     @Test
     void 다른_사용자가_이미_예약중일_경우_예외가_발생해야_한다() {
         // given
+        given(holdSeatIdempotencyCachePort.tryProcess(anyString()))
+                .willReturn(true);
         given(holdSeatCachePort.validateHoldSeatList(scheduleId, seatIds, userId))
                 .willReturn(false);
         given(holdSeatCachePort.holdSeatList(scheduleId, seatIds, userId))
@@ -161,6 +168,8 @@ HoldSeatUseCaseTest {
         AtomicInteger failCount = new AtomicInteger(0);
 
         // 첫 번 째 호출만 성공하도록 설정
+        given(holdSeatIdempotencyCachePort.tryProcess(anyString()))
+                .willReturn(true);
         given(holdSeatCachePort.validateHoldSeatList(eq(scheduleId), eq(seatIds), anyLong()))
                 .willReturn(false);
         given(holdSeatCachePort.holdSeatList(eq(scheduleId), eq(seatIds), anyLong()))
@@ -200,6 +209,8 @@ HoldSeatUseCaseTest {
         int threadCount = 10;
         AtomicInteger successCount = new AtomicInteger(0);
 
+        given(holdSeatIdempotencyCachePort.tryProcess(anyString()))
+                .willReturn(true);
         given(holdSeatCachePort.validateHoldSeatList(anyLong(), anyList(), anyLong()))
                 .willReturn(false);
         given(holdSeatCachePort.holdSeatList(anyLong(), anyList(), anyLong()))
@@ -256,7 +267,7 @@ HoldSeatUseCaseTest {
         List<Long> seatIds = Arrays.asList(101L, 102L, 103L, 102L, 101L);
         HoldSeatResult cached = HoldSeatResult.of(1L, seatIds, 5L, 500);
         given(holdSeatIdempotencyCachePort.findByIdempotencyKey(command.idempotencyKey()))
-                .willReturn(Optional.of(cached));
+                .willReturn(cached);
 
         // when
         HoldSeatResult result = holdSeatService.execute(command);
@@ -269,11 +280,10 @@ HoldSeatUseCaseTest {
     }
 
     @Test
-    void 멱등성_저장에_실패하더라도_비즈니스_결과에_영향을_주면_안_된다() {
+    void 멱등성_저장에_실패하면_비즈니스도_실패해야_한다() {
         // given
-        // 좌석을 성공적으로 홀딩하도록 설정
-        given(holdSeatIdempotencyCachePort.findByIdempotencyKey(command.idempotencyKey()))
-                .willReturn(Optional.empty());
+        given(holdSeatIdempotencyCachePort.tryProcess(anyString()))
+                .willReturn(true);
         given(holdSeatCachePort.validateHoldSeatList(command.scheduleId(), command.seatIds(), command.userId()))
                 .willReturn(false);
         given(holdSeatCachePort.holdSeatList(command.scheduleId(), command.seatIds(), command.userId()))
@@ -281,21 +291,13 @@ HoldSeatUseCaseTest {
         given(holdSeatCachePort.getHoldTTLSeconds(command.scheduleId(), command.seatIds(), command.userId()))
                 .willReturn(300L);
 
-        // 멱등성 저장(saveResult)이 예외 발생하도록 설정
-        doThrow(new RuntimeException("Redis 저장 실패"))
+        // 멱등성 저장 실패
+        doThrow(new RuntimeException("동시성 문제가 발생했습니다."))
                 .when(holdSeatIdempotencyCachePort).saveResult(anyString(), any(HoldSeatResult.class));
 
-        // when
-        HoldSeatResult result = holdSeatService.execute(command);
-
-        // then
-        assertThat(result.scheduleId()).isEqualTo(command.scheduleId());
-        assertThat(result.seatIds()).containsExactlyElementsOf(command.seatIds());
-        assertThat(result.userId()).isEqualTo(command.userId());
-        assertThat(result.ttlSeconds()).isEqualTo(300L);
-
-        // 멱등성 저장을 시도는 했는지 확인
-        then(holdSeatIdempotencyCachePort).should()
-                .saveResult(eq(command.idempotencyKey()), any(HoldSeatResult.class));
+        // when & then
+        assertThatThrownBy(() -> holdSeatService.execute(command))
+                .isInstanceOf(RuntimeException.class)
+                .hasMessageContaining("동시성 문제가 발생했습니다.");
     }
 }
