@@ -76,19 +76,15 @@ public class HoldSeatCacheAdapter implements HoldSeatCachePort {
                     .toList();
 
             for (String holdKey : holdKeys) {
-                // RBucket은 Redis의 단일 key-value 데이터를 다루는 Redisson 인터페이스
-                // 해당 좌석 키값이 이미 캐싱되고 있는지 확인
                 RBucket<String> bucket = redissonClient.getBucket(holdKey);
+                // 2-1. 해당 좌석 키값이 이미 캐싱되고 있는지 확인
                 if (bucket.isExists()) {
                     log.warn("이미 홀딩된 좌석 존재: holdKey={}, scheduleId={}, userId={}",
                             holdKey, scheduleId, userId);
                     return false; // 하나라도 이미 홀딩되어 있으면 전체 실패
                 }
-            }
 
-            // 3. 모든 좌석이 홀딩이 가능하다면, 모든 좌석 홀딩 처리
-            for (String holdKey : holdKeys) {
-                RBucket<String> bucket = redissonClient.getBucket(holdKey);
+                // 2-2. 모든 좌석이 홀딩이 가능하다면, 모든 좌석 홀딩 처리
                 bucket.set(userId.toString(), Duration.ofSeconds(HOLD_TTL_SECONDS));
             }
 
