@@ -3,6 +3,7 @@ package com.roovies.concertreservation.reservations.application;
 import com.roovies.concertreservation.reservations.application.dto.command.HoldSeatCommand;
 import com.roovies.concertreservation.reservations.application.dto.result.HoldSeatResult;
 import com.roovies.concertreservation.reservations.application.port.out.HoldSeatCachePort;
+import com.roovies.concertreservation.reservations.application.port.out.HoldSeatIdempotencyCachePort;
 import com.roovies.concertreservation.reservations.application.service.HoldSeatService;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -14,6 +15,7 @@ import org.mockito.junit.jupiter.MockitoExtension;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
+import java.util.Optional;
 import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.atomic.AtomicInteger;
 import java.util.stream.IntStream;
@@ -22,10 +24,14 @@ import static org.assertj.core.api.Assertions.*;
 import static org.mockito.BDDMockito.*;
 
 @ExtendWith(MockitoExtension.class)
-public class HoldSeatUseCaseTest {
+public class
+HoldSeatUseCaseTest {
 
     @Mock
     private HoldSeatCachePort holdSeatCachePort;
+
+    @Mock
+    private HoldSeatIdempotencyCachePort holdSeatIdempotencyCachePort;
 
     @InjectMocks
     private HoldSeatService holdSeatService;
@@ -40,13 +46,18 @@ public class HoldSeatUseCaseTest {
         scheduleId = 1L;
         userId = 100L;
         seatIds = Arrays.asList(1L, 2L, 3L);
-        command = new HoldSeatCommand(scheduleId, seatIds, userId);
+        command = new HoldSeatCommand("idempotencyKey", scheduleId, seatIds, userId);
     }
 
     @Test
     void 정상적인_좌석_예약_요청시_성공해야_한다() {
         // given
         long expectedTTL = 300L;
+
+        // 멱등성 정보가 없음
+        given(holdSeatIdempotencyCachePort.findByIdempotencyKey(command.idempotencyKey()))
+                .willReturn(Optional.empty());
+
         // 현재 홀딩된 정보가 없음
         given(holdSeatCachePort.validateHoldSeatList(scheduleId, seatIds, userId))
                 .willReturn(false);
@@ -69,7 +80,7 @@ public class HoldSeatUseCaseTest {
     @Test
     void 좌석_목록이_null이면_예외가_발생해야_한다() {
         // given
-        HoldSeatCommand nullSeatIdsCommand = new HoldSeatCommand(scheduleId, null, userId);
+        HoldSeatCommand nullSeatIdsCommand = new HoldSeatCommand("idempotencyKey", scheduleId, null, userId);
 
         // when & then
         assertThatThrownBy(() -> holdSeatService.execute(nullSeatIdsCommand))
@@ -80,7 +91,7 @@ public class HoldSeatUseCaseTest {
     @Test
     void 좌석_목록이_비어있을_때_예외가_발생해야_한다() {
         // given
-        HoldSeatCommand nullSeatIdsCommand = new HoldSeatCommand(scheduleId, new ArrayList<>(), userId);
+        HoldSeatCommand nullSeatIdsCommand = new HoldSeatCommand("idempotencyKey", scheduleId, new ArrayList<>(), userId);
 
         // when & then
         assertThatThrownBy(() -> holdSeatService.execute(nullSeatIdsCommand))
@@ -93,7 +104,7 @@ public class HoldSeatUseCaseTest {
         // given
         List<Long> duplicateSeatIds = Arrays.asList(101L, 102L, 103L, 102L, 101L);
         List<Long> uniqueSeatIds = Arrays.asList(101L, 102L, 103L);
-        HoldSeatCommand duplicateCommand = new HoldSeatCommand(scheduleId, duplicateSeatIds, userId);
+        HoldSeatCommand duplicateCommand = new HoldSeatCommand("idempotencyKey", scheduleId, duplicateSeatIds, userId);
 
         long expectedTTL = 300L;
         given(holdSeatCachePort.validateHoldSeatList(scheduleId, uniqueSeatIds, userId))
@@ -163,7 +174,7 @@ public class HoldSeatUseCaseTest {
                 IntStream.range(0, threadCount)
                         .mapToObj(num -> CompletableFuture.runAsync(() -> {
                             Long currentUserId = 1000L + num;
-                            HoldSeatCommand currentCommand = new HoldSeatCommand(scheduleId, seatIds, currentUserId);
+                            HoldSeatCommand currentCommand = new HoldSeatCommand("idempotencyKey", scheduleId, seatIds, currentUserId);
                             try {
                                 HoldSeatResult result = holdSeatService.execute(currentCommand);
                                 successCount.incrementAndGet();
@@ -202,7 +213,7 @@ public class HoldSeatUseCaseTest {
                         .mapToObj(num -> CompletableFuture.runAsync(() -> {
                             Long currentUserId = 1000L + num;
                             List<Long> uniqueSeats = Arrays.asList(100L + num); // 각 쓰레드마다 다른 좌석                   HoldSeatCommand currentCommand = new HoldSeatCommand(scheduleId, seatIds, currentUserId);
-                            HoldSeatCommand concurrentCommand = new HoldSeatCommand(scheduleId, uniqueSeats, 1000L + num);
+                            HoldSeatCommand concurrentCommand = new HoldSeatCommand("idempotencyKey", scheduleId, uniqueSeats, 1000L + num);
                             HoldSeatResult result = holdSeatService.execute(concurrentCommand);
                             successCount.incrementAndGet();
                         }))
@@ -213,5 +224,78 @@ public class HoldSeatUseCaseTest {
 
         // then
         assertThat(successCount.get()).isEqualTo(threadCount);
+    }
+
+    @Test
+    void 멱등성키가_null일_경우_예외가_발생해야_한다() {
+        // given
+        List<Long> seatIds = Arrays.asList(101L, 102L, 103L, 102L, 101L);
+        HoldSeatCommand command = new HoldSeatCommand(null, scheduleId, seatIds, userId);
+
+        // when & then
+        assertThatThrownBy(() -> holdSeatService.execute(command))
+                .isInstanceOf(IllegalArgumentException.class)
+                .hasMessage("요청 식별자(Idempotency Key)가 필요합니다.");
+    }
+
+    @Test
+    void 멱등성키가_빈값일_경우_예외가_발생해야_한다() {
+        // given
+        List<Long> seatIds = Arrays.asList(101L, 102L, 103L, 102L, 101L);
+        HoldSeatCommand command = new HoldSeatCommand("", scheduleId, seatIds, userId);
+
+        // when & then
+        assertThatThrownBy(() -> holdSeatService.execute(command))
+                .isInstanceOf(IllegalArgumentException.class)
+                .hasMessage("요청 식별자(Idempotency Key)가 필요합니다.");
+    }
+
+    @Test
+    void 이미_멱등성키가_존재할_경우_캐싱된_결과를_반환해야_한다() {
+        // given
+        List<Long> seatIds = Arrays.asList(101L, 102L, 103L, 102L, 101L);
+        HoldSeatResult cached = HoldSeatResult.of(1L, seatIds, 5L, 500);
+        given(holdSeatIdempotencyCachePort.findByIdempotencyKey(command.idempotencyKey()))
+                .willReturn(Optional.of(cached));
+
+        // when
+        HoldSeatResult result = holdSeatService.execute(command);
+
+        // then
+        assertThat(result.scheduleId()).isEqualTo(cached.scheduleId());
+        assertThat(result.seatIds()).containsExactlyElementsOf(cached.seatIds());
+        assertThat(result.userId()).isEqualTo(cached.userId());
+        assertThat(result.ttlSeconds()).isEqualTo(cached.ttlSeconds());
+    }
+
+    @Test
+    void 멱등성_저장에_실패하더라도_비즈니스_결과에_영향을_주면_안_된다() {
+        // given
+        // 좌석을 성공적으로 홀딩하도록 설정
+        given(holdSeatIdempotencyCachePort.findByIdempotencyKey(command.idempotencyKey()))
+                .willReturn(Optional.empty());
+        given(holdSeatCachePort.validateHoldSeatList(command.scheduleId(), command.seatIds(), command.userId()))
+                .willReturn(false);
+        given(holdSeatCachePort.holdSeatList(command.scheduleId(), command.seatIds(), command.userId()))
+                .willReturn(true);
+        given(holdSeatCachePort.getHoldTTLSeconds(command.scheduleId(), command.seatIds(), command.userId()))
+                .willReturn(300L);
+
+        // 멱등성 저장(saveResult)이 예외 발생하도록 설정
+        doThrow(new RuntimeException("Redis 저장 실패"))
+                .when(holdSeatIdempotencyCachePort).saveResult(anyString(), any(HoldSeatResult.class));
+
+        // when
+        HoldSeatResult result = holdSeatService.execute(command);
+
+        // then
+        assertThat(result.scheduleId()).isEqualTo(command.scheduleId());
+        assertThat(result.seatIds()).containsExactlyElementsOf(command.seatIds());
+        assertThat(result.userId()).isEqualTo(command.userId());
+        assertThat(result.ttlSeconds()).isEqualTo(300L);
+
+        // 멱등성 저장을 시도는 했는지 확인
+        then(holdSeatIdempotencyCachePort).should()
+                .saveResult(eq(command.idempotencyKey()), any(HoldSeatResult.class));
     }
 }

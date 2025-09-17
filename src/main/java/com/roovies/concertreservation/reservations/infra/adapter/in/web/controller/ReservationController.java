@@ -140,10 +140,11 @@ public class ReservationController {
     @PostMapping
     public ResponseEntity<CreateReservationResponse> createReservation(
             @AuthenticationPrincipal UserDetails userDetails, // TODO: Custom UserDetails 구현 필요
+            @RequestHeader("Idempotency-Key") String idempotencyKey,
             @Valid @RequestBody CreateReservationRequest request
     ) {
         // TODO: 스프링 시큐리티 구현 후 회원 ID 넘기도록 수정해야 함
-        HoldSeatCommand command = HoldSeatCommand.of(request.scheduleId(), request.seatIds(), 1L);
+        HoldSeatCommand command = HoldSeatCommand.of(idempotencyKey, request.scheduleId(), request.seatIds(), 1L);
         HoldSeatResult result = holdSeatUseCase.execute(command);
         return ResponseEntity.status(HttpStatus.CREATED).body(
                 CreateReservationResponse.builder()
