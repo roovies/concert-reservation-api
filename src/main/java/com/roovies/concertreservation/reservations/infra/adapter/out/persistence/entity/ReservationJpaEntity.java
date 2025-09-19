@@ -1,5 +1,6 @@
 package com.roovies.concertreservation.reservations.infra.adapter.out.persistence.entity;
 
+import com.roovies.concertreservation.payments.infra.adapter.out.persistence.entity.PaymentJpaEntity;
 import com.roovies.concertreservation.reservations.domain.enums.ReservationStatus;
 import com.roovies.concertreservation.users.infra.adapter.out.persistence.entity.UserJpaEntity;
 import jakarta.persistence.*;
@@ -19,6 +20,11 @@ public class ReservationJpaEntity {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
+
+    // 결제 ID (FK) - 예약과 결제는 1:1
+    @OneToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "payment_id", nullable = false)
+    private PaymentJpaEntity paymentJpaEntity;
 
     @ManyToOne(fetch = FetchType.LAZY, optional = false)
     @JoinColumn(name = "user_id", nullable = false)

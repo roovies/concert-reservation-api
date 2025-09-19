@@ -61,7 +61,7 @@ public class HoldSeatService implements HoldSeatUseCase {
             // 5. 만약 현재 사용자가 모든 좌석을 홀딩하고 있다면 이미 예약하고 있으므로 결과 반환
             if (holdSeatCachePort.validateHoldSeatList(scheduleId, uniqueSeatIds, userId)) {
                 long ttl = holdSeatCachePort.getHoldTTLSeconds(scheduleId, uniqueSeatIds, userId);
-                return HoldSeatResult.of(scheduleId, uniqueSeatIds, userId, ttl);
+                return HoldSeatResult.of(scheduleId, uniqueSeatIds, userId,0L, ttl); // TODO: totalPrice 계산 후 적재해줘야 함
             }
 
             // 6. 좌석 예약 시도
@@ -74,6 +74,7 @@ public class HoldSeatService implements HoldSeatUseCase {
                     scheduleId,
                     uniqueSeatIds,
                     userId,
+                    0L, // TODO: totalPrice 계산 후 적재해줘야 함
                     holdSeatCachePort.getHoldTTLSeconds(scheduleId, uniqueSeatIds, userId)
             );
 

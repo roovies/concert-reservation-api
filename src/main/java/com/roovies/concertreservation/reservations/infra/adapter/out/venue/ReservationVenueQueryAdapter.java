@@ -1,6 +1,7 @@
 package com.roovies.concertreservation.reservations.infra.adapter.out.venue;
 
 import com.roovies.concertreservation.venues.application.dto.result.GetVenueWithSeatsResult;
+import com.roovies.concertreservation.venues.application.port.in.GetSeatsTotalPriceUseCase;
 import com.roovies.concertreservation.venues.application.port.in.GetVenueWithSeatsUseCase;
 import com.roovies.concertreservation.reservations.application.port.out.ReservationVenueQueryPort;
 import com.roovies.concertreservation.reservations.domain.vo.external.ReservationVenueSnapShot;
@@ -14,6 +15,7 @@ import java.util.List;
 public class ReservationVenueQueryAdapter implements ReservationVenueQueryPort {
 
     private final GetVenueWithSeatsUseCase getVenueWithSeatsUseCase;
+    private final GetSeatsTotalPriceUseCase getSeatsTotalPriceUseCase;
 
     @Override
     public ReservationVenueSnapShot findVenueWithSeats(Long venueId) {
@@ -35,5 +37,10 @@ public class ReservationVenueQueryAdapter implements ReservationVenueQueryPort {
                 .totalSeats(result.totalSeats())
                 .seats(seats)
                 .build();
+    }
+
+    @Override
+    public Long getTotalSeatPrice(List<Long> seatIds) {
+        return getSeatsTotalPriceUseCase.execute(seatIds);
     }
 }

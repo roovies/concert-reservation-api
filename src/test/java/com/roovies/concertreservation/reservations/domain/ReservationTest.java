@@ -22,6 +22,7 @@ public class ReservationTest {
         assertThatThrownBy(() -> Reservation.create(
                 1L,
                 5L,
+                5L,
                 ReservationStatus.HOLD,
                 LocalDateTime.of(2025, 9, 9, 15, 26),
                 null,
@@ -39,6 +40,7 @@ public class ReservationTest {
         // when & then
         assertThatThrownBy(() -> Reservation.create(
                 1L,
+                5L,
                 5L,
                 ReservationStatus.HOLD,
                 LocalDateTime.of(2025, 9, 9, 15, 26),
@@ -63,6 +65,7 @@ public class ReservationTest {
         // when
         Reservation reservation = Reservation.create(
                 1L,
+                5L,
                 5L,
                 ReservationStatus.HOLD,
                 LocalDateTime.of(2025, 9, 9, 15, 26),
@@ -99,6 +102,7 @@ public class ReservationTest {
         assertThatThrownBy(() -> Reservation.create(
                 10L,
                 5L,
+                5L,
                 ReservationStatus.HOLD,
                 LocalDateTime.of(2025, 9, 9, 15, 26),
                 null,
@@ -122,6 +126,7 @@ public class ReservationTest {
         Reservation reservation = Reservation.create(
                 5L,
                 1L,
+                5L,
                 ReservationStatus.HOLD,
                 LocalDateTime.of(2025, 9, 9, 15, 26),
                 null,
@@ -163,6 +168,7 @@ public class ReservationTest {
         assertThatThrownBy(() -> Reservation.create(
                 5L,
                 1L,
+                5L,
                 ReservationStatus.HOLD,
                 LocalDateTime.of(2025, 9, 9, 15, 26),
                 null,

@@ -65,4 +65,13 @@ public class VenueRepositoryAdapter implements VenueRepositoryPort {
         }
         return Optional.empty();
     }
+
+    @Override
+    public Long getTotalSeatsPrice(List<Long> seatIds) {
+        if (seatIds == null || seatIds.isEmpty()) {
+            return 0L;
+        }
+
+        return venueSeatJpaRepository.getTotalPriceBySeatIds(seatIds);
+    }
 }
