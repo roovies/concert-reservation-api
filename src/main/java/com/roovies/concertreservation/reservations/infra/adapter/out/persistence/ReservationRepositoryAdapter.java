@@ -28,6 +28,7 @@ public class ReservationRepositoryAdapter implements ReservationRepositoryPort {
                     Reservation.create(
                             reservation.getId(),
                             reservation.getUser().getId(),
+                            reservation.getPaymentJpaEntity().getId(),
                             reservation.getStatus(),
                             reservation.getCreatedAt(),
                             reservation.getUpdatedAt(),
@@ -60,6 +61,7 @@ public class ReservationRepositoryAdapter implements ReservationRepositoryPort {
                     return Reservation.create(
                             entity.getId(),
                             entity.getUser().getId(),
+                            entity.getPaymentJpaEntity().getId(),
                             entity.getStatus(),
                             entity.getCreatedAt(),
                             entity.getUpdatedAt(),

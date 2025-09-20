@@ -235,7 +235,7 @@ public class GetAvailableSeatsUseCaseTest {
                 ReservationDetail.create(1L, 100L, 5L, 1L)
         );
         List<Reservation> reservations = List.of(
-                Reservation.create(100L, 1000L, ReservationStatus.CONFIRMED,
+                Reservation.create(100L, 1000L, 5L, ReservationStatus.CONFIRMED,
                         LocalDateTime.now(), LocalDateTime.now(), reservationDetails)
         );
         given(reservationRepositoryPort.findReservationsByDetailScheduleId(schedule.id()))

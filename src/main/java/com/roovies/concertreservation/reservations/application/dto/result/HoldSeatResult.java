@@ -6,9 +6,10 @@ public record HoldSeatResult(
         Long scheduleId,
         List<Long> seatIds,
         Long userId,
+        Long totalPrice,
         long ttlSeconds
 ) {
-    public static HoldSeatResult of(Long scheduleId, List<Long> seatIds, Long userId, long ttlSeconds) {
-        return new HoldSeatResult(scheduleId, seatIds, userId, ttlSeconds);
+    public static HoldSeatResult of(Long scheduleId, List<Long> seatIds, Long userId, Long totalPrice, long ttlSeconds) {
+        return new HoldSeatResult(scheduleId, seatIds, userId, totalPrice, ttlSeconds);
     }
 }

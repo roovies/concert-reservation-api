@@ -265,7 +265,7 @@ HoldSeatUseCaseTest {
     void 이미_멱등성키가_존재할_경우_캐싱된_결과를_반환해야_한다() {
         // given
         List<Long> seatIds = Arrays.asList(101L, 102L, 103L, 102L, 101L);
-        HoldSeatResult cached = HoldSeatResult.of(1L, seatIds, 5L, 500);
+        HoldSeatResult cached = HoldSeatResult.of(1L, seatIds, 5L, 5L, 500);
         given(holdSeatIdempotencyCachePort.findByIdempotencyKey(command.idempotencyKey()))
                 .willReturn(cached);
 
