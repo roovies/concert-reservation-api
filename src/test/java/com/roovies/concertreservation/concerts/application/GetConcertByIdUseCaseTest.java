@@ -7,7 +7,7 @@ import com.roovies.concertreservation.concerts.application.port.out.ConcertRepos
 import com.roovies.concertreservation.concerts.domain.entity.Concert;
 import com.roovies.concertreservation.concerts.domain.entity.ConcertSchedule;
 import com.roovies.concertreservation.concerts.domain.enums.ScheduleStatus;
-import com.roovies.concertreservation.concerts.domain.vo.external.ConcertVenueSnapShot;
+import com.roovies.concertreservation.concerts.domain.external.venue.ConcertVenueSnapShot;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.junit.jupiter.params.ParameterizedTest;

@@ -52,7 +52,10 @@ public class ChargePointConcurrencyTest {
                 IntStream.range(0, threadCount)
                         .mapToObj(i -> CompletableFuture.runAsync(() -> {
                             try {
-                                chargePointService.execute(ChargePointCommand.of(userId, chargeAmount));
+                                chargePointService.execute(ChargePointCommand.builder()
+                                                .userId(userId)
+                                                .amount(chargeAmount)
+                                                .build());
                             } catch (Exception e) {
                                 System.err.println("Thread " + i + " failed: " + e.getMessage());
                                 // 예외 발생해도 테스트는 계속 진행

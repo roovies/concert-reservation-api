@@ -37,10 +37,10 @@ public class ChargePointService implements ChargePointUseCase {
         point.charge(chargeAmount);
 
         Point result = pointRepositoryPort.save(point);
-        return ChargePointResult.of(
-                result.getUserId(),
-                result.getAmount().value(),
-                result.getUpdatedAt()
-        );
+        return ChargePointResult.builder()
+                .userId(result.getUserId())
+                .totalAmount(result.getAmount().value())
+                .updatedAt(result.getUpdatedAt())
+                .build();
     }
 }

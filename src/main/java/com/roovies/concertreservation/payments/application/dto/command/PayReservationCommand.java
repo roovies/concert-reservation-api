@@ -1,7 +1,10 @@
 package com.roovies.concertreservation.payments.application.dto.command;
 
+import lombok.Builder;
+
 import java.util.List;
 
+@Builder
 public record PayReservationCommand(
         String idempotencyKey,
         Long scheduleId,
@@ -9,22 +12,4 @@ public record PayReservationCommand(
         Long userId,
         Long payForAmount,
         Long discountAmount
-) {
-    public static PayReservationCommand of(
-            String idempotencyKey,
-            Long scheduleId,
-            List<Long> seatIds,
-            Long userId,
-            Long payForAmount,
-            Long discountAmount
-    ) {
-        return new PayReservationCommand(
-                idempotencyKey,
-                scheduleId,
-                seatIds,
-                userId,
-                payForAmount,
-                discountAmount
-        );
-    }
-}
+) {}

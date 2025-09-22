@@ -33,7 +33,10 @@ public class ChargePointServiceTest {
 
     @BeforeEach
     void setUp() {
-        command = ChargePointCommand.of(1L, 1000L);
+        command = ChargePointCommand.builder()
+                .userId(1L)
+                .amount(1000L)
+                .build();
     }
 
     @Test

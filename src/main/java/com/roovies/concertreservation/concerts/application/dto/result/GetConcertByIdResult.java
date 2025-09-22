@@ -1,14 +1,14 @@
 package com.roovies.concertreservation.concerts.application.dto.result;
 
-import com.roovies.concertreservation.concerts.domain.entity.Concert;
 import com.roovies.concertreservation.concerts.domain.enums.ConcertStatus;
-import com.roovies.concertreservation.concerts.domain.vo.external.ConcertVenueSnapShot;
 import io.swagger.v3.oas.annotations.media.Schema;
+import lombok.Builder;
 
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 
 @Schema(description = "콘서트 상세 정보 응답 DTO")
+@Builder
 public record GetConcertByIdResult(
         @Schema(description = "콘서트 ID", example = "101")
         Long id,
@@ -39,19 +39,4 @@ public record GetConcertByIdResult(
 
         @Schema(description = "수정일", example = "2025-08-26T21:00:00")
         LocalDateTime updatedAt
-) {
-        public static GetConcertByIdResult from(Concert concert, ConcertStatus concertStatus, ConcertVenueSnapShot venue) {
-                return new GetConcertByIdResult(
-                        concert.getId(),
-                        concert.getTitle(),
-                        concert.getDescription(),
-                        concert.getMinPrice(),
-                        concert.getStartDate(),
-                        concert.getEndDate(),
-                        concertStatus,
-                        venue.name(),
-                        concert.getCreatedAt(),
-                        concert.getUpdatedAt()
-                );
-        }
-}
+) {}

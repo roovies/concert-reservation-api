@@ -61,7 +61,14 @@ public class HoldSeatService implements HoldSeatUseCase {
             // 5. 만약 현재 사용자가 모든 좌석을 홀딩하고 있다면 이미 예약하고 있으므로 결과 반환
             if (holdSeatCachePort.validateHoldSeatList(scheduleId, uniqueSeatIds, userId)) {
                 long ttl = holdSeatCachePort.getHoldTTLSeconds(scheduleId, uniqueSeatIds, userId);
-                return HoldSeatResult.of(scheduleId, uniqueSeatIds, userId,0L, ttl); // TODO: totalPrice 계산 후 적재해줘야 함
+                // TODO: totalPrice 계산 후 적재해줘야 함
+                return HoldSeatResult.builder()
+                        .scheduleId(scheduleId)
+                        .seatIds(uniqueSeatIds)
+                        .userId(userId)
+                        .totalPrice(0L)
+                        .ttlSeconds(ttl)
+                        .build();
             }
 
             // 6. 좌석 예약 시도
@@ -70,13 +77,13 @@ public class HoldSeatService implements HoldSeatUseCase {
                 throw new IllegalStateException("다른 사용자가 이미 예약 중인 좌석입니다.");
 
             // 7. 결과 생성 및 멱등성 저장
-            HoldSeatResult result = HoldSeatResult.of(
-                    scheduleId,
-                    uniqueSeatIds,
-                    userId,
-                    0L, // TODO: totalPrice 계산 후 적재해줘야 함
-                    holdSeatCachePort.getHoldTTLSeconds(scheduleId, uniqueSeatIds, userId)
-            );
+            HoldSeatResult result = HoldSeatResult.builder()
+                    .scheduleId(scheduleId)
+                    .seatIds(uniqueSeatIds)
+                    .userId(userId)
+                    .totalPrice(0L) // TODO: totalPrice 계산 후 적재해줘야 함
+                    .ttlSeconds(holdSeatCachePort.getHoldTTLSeconds(scheduleId, uniqueSeatIds, userId))
+                    .build();
 
             holdSeatIdempotencyCachePort.saveResult(idempotencyKey, result);
             log.info("좌석 홀딩 성공 및 멱등성 저장: idempotencyKey={}, result={}",
@@ -87,7 +94,6 @@ public class HoldSeatService implements HoldSeatUseCase {
             // 결과가 저장되지 않은 경우에만 처리 상태 제거
             if (holdSeatIdempotencyCachePort.isProcessing(idempotencyKey))
                 holdSeatIdempotencyCachePort.removeProcessingStatus(idempotencyKey);
-
             throw e;
         }
     }

@@ -144,7 +144,12 @@ public class ReservationController {
             @Valid @RequestBody CreateReservationRequest request
     ) {
         // TODO: 스프링 시큐리티 구현 후 회원 ID 넘기도록 수정해야 함
-        HoldSeatCommand command = HoldSeatCommand.of(idempotencyKey, request.scheduleId(), request.seatIds(), 1L);
+        HoldSeatCommand command = HoldSeatCommand.builder()
+                .idempotencyKey(idempotencyKey)
+                .scheduleId(request.scheduleId())
+                .seatIds(request.seatIds())
+                .userId(1L)
+                .build();
         HoldSeatResult result = holdSeatUseCase.execute(command);
         return ResponseEntity.status(HttpStatus.CREATED).body(
                 CreateReservationResponse.builder()

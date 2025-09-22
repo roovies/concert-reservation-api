@@ -5,7 +5,7 @@ import com.roovies.concertreservation.concerts.application.port.in.GetConcertByI
 import com.roovies.concertreservation.concerts.application.port.out.ConcertVenueQueryPort;
 import com.roovies.concertreservation.concerts.application.port.out.ConcertRepositoryPort;
 import com.roovies.concertreservation.concerts.domain.entity.Concert;
-import com.roovies.concertreservation.concerts.domain.vo.external.ConcertVenueSnapShot;
+import com.roovies.concertreservation.concerts.domain.external.venue.ConcertVenueSnapShot;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
@@ -34,6 +34,17 @@ public class GetConcertByIdService implements GetConcertByIdUseCase {
         ConcertVenueSnapShot venue = concertVenueQueryPort.findVenueById(venueId);
         LocalDate now = LocalDate.now(clock);
 
-        return GetConcertByIdResult.from(concert, concert.getStatus(now), venue);
+        return GetConcertByIdResult.builder()
+                .id(concert.getId())
+                .title(concert.getTitle())
+                .description(concert.getDescription())
+                .minPrice(concert.getMinPrice())
+                .startDate(concert.getStartDate())
+                .endDate(concert.getEndDate())
+                .status(concert.getStatus(now))
+                .venueName(venue.name())
+                .createdAt(concert.getCreatedAt())
+                .updatedAt(concert.getUpdatedAt())
+                .build();
     }
 }

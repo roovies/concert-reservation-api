@@ -117,7 +117,11 @@ public class PointController {
             @AuthenticationPrincipal UserDetails userDetails, // TODO: Custom User Details 구현 필요
             @Valid @RequestBody UpdatePointRequest request
     ) {
-        ChargePointCommand command = ChargePointCommand.of(1L, request.amount());
+        ChargePointCommand command = ChargePointCommand.builder()
+                .userId(1L)
+                .amount(request.amount())
+                .build();
+                
         ChargePointResult result = chargePointUseCase.execute(command);
         return ResponseEntity.status(HttpStatus.CREATED).body(
                 UpdatePointResponse.builder()

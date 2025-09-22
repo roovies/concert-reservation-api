@@ -1,4 +1,4 @@
-package com.roovies.concertreservation.concerts.domain.vo.external;
+package com.roovies.concertreservation.concerts.domain.external.venue;
 
 import lombok.Builder;
 

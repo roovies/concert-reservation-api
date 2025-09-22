@@ -25,7 +25,13 @@ public class GetHeldSeatsService implements GetHeldSeatsUseCase {
     public HoldSeatResult execute(GetHeldSeatsQuery query) {
         List<HoldSeat> response = holdSeatCachePort.getHoldSeatList(query.scheduleId(), query.seatIds(), query.userId());
         if (response.isEmpty())
-            return HoldSeatResult.of(query.scheduleId(), Collections.emptyList(), query.userId(), 0L, 0L);
+            return HoldSeatResult.builder()
+                    .scheduleId(query.scheduleId())
+                    .seatIds(Collections.emptyList())
+                    .userId(query.userId())
+                    .totalPrice(0L)
+                    .ttlSeconds(0L)
+                    .build();
 
         long ttl = holdSeatCachePort.getHoldTTLSeconds(query.scheduleId(), query.seatIds(), query.userId());
         List<Long> seatIds = response.stream()
@@ -34,6 +40,12 @@ public class GetHeldSeatsService implements GetHeldSeatsUseCase {
         Long scheduleId = response.get(0).getScheduleId();
         Long totalPrice = reservationVenueQueryPort.getTotalSeatPrice(seatIds);
 
-        return HoldSeatResult.of(scheduleId, seatIds, query.userId(), totalPrice, ttl);
+        return HoldSeatResult.builder()
+                .scheduleId(scheduleId)
+                .seatIds(seatIds)
+                .userId(query.userId())
+                .totalPrice(totalPrice)
+                .ttlSeconds(ttl)
+                .build();
     }
 }

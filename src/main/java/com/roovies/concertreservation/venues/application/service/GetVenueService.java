@@ -19,6 +19,12 @@ public class GetVenueService implements GetVenueUseCase {
     public GetVenueResult execute(Long venueId) {
         Venue venue = venueRepositoryPort.findById(venueId)
                 .orElseThrow(() -> new NoSuchElementException("공연장을 찾을 수 없습니다."));
-        return GetVenueResult.from(venue);
+        return GetVenueResult.builder()
+                .id(venue.getId())
+                .name(venue.getName())
+                .totalSeats(venue.getTotalSeats())
+                .createdAt(venue.getCreatedAt())
+                .updatedAt(venue.getUpdatedAt())
+                .build();
     }
 }

@@ -60,22 +60,21 @@ public class PayReservationService implements PayReservationUseCase {
         try {
             Payment result = processPayment(command, heldSeats);
             // 결과 객체 생성
-            PayReservationResult payReservationResult = PayReservationResult.of(
-                    result.getId(),
-                    command.scheduleId(),
-                    command.seatIds(),
-                    command.userId(),
-                    result.getOriginalAmount().value(),
-                    result.getDiscountAmount().value(),
-                    result.getPaidAmount().value(),
-                    result.getStatus(),
-                    result.getCreatedAt()
-            );
+            PayReservationResult payReservationResult = PayReservationResult.builder()
+                    .paymentId(result.getId())
+                    .scheduleId(command.scheduleId())
+                    .seatIds(command.seatIds())
+                    .userId(command.userId())
+                    .originalAmount(result.getOriginalAmount().value())
+                    .discountAmount(result.getDiscountAmount().value())
+                    .paidAmount(result.getPaidAmount().value())
+                    .status(result.getStatus())
+                    .completedAt(result.getCreatedAt())
+                    .build();
 
             // 성공한 경우 멱등성 정보 갱신
             paymentIdempotencyRepositoryPort.setResult(idempotency, result.getId(), objectMapper.writeValueAsString(payReservationResult));
             return payReservationResult;
-
         } catch (IllegalStateException e) {
             // 비즈니스 로직 실패 (포인트 부족, 좌석 없음 등)
             log.warn("결제 비즈니스 로직 실패: idempotencyKey={}, reason={}",
