@@ -121,8 +121,8 @@ public class PointController {
                 .userId(1L)
                 .amount(request.amount())
                 .build();
-                
-        ChargePointResult result = chargePointUseCase.execute(command);
+
+        ChargePointResult result = chargePointUseCase.charge(command);
         return ResponseEntity.status(HttpStatus.CREATED).body(
                 UpdatePointResponse.builder()
                         .userId(result.userId())

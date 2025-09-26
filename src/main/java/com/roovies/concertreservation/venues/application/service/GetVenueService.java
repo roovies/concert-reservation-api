@@ -16,7 +16,7 @@ public class GetVenueService implements GetVenueUseCase {
     private final VenueRepositoryPort venueRepositoryPort;
 
     @Override
-    public GetVenueResult execute(Long venueId) {
+    public GetVenueResult findById(Long venueId) {
         Venue venue = venueRepositoryPort.findById(venueId)
                 .orElseThrow(() -> new NoSuchElementException("공연장을 찾을 수 없습니다."));
         return GetVenueResult.builder()

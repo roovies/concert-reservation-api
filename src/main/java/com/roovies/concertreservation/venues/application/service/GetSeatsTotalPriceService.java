@@ -16,7 +16,7 @@ public class GetSeatsTotalPriceService implements GetSeatsTotalPriceUseCase {
     private final VenueRepositoryPort venueRepositoryPort;
 
     @Override
-    public Long execute(List<Long> seatIds) {
+    public Long getSeatListTotalPrice(List<Long> seatIds) {
         if (seatIds == null || seatIds.isEmpty()) {
             return 0L;
         }

@@ -66,7 +66,7 @@ HoldSeatUseCaseTest {
                 .willReturn(expectedTTL);
 
         // when
-        HoldSeatResult result = holdSeatService.execute(command);
+        HoldSeatResult result = holdSeatService.holdSeat(command);
 
         // then
         assertThat(result).isNotNull();
@@ -88,7 +88,7 @@ HoldSeatUseCaseTest {
         given(holdSeatIdempotencyCachePort.tryProcess(anyString())).willReturn(true);
 
         // when & then
-        assertThatThrownBy(() -> holdSeatService.execute(nullSeatIdsCommand))
+        assertThatThrownBy(() -> holdSeatService.holdSeat(nullSeatIdsCommand))
                 .isInstanceOf(IllegalArgumentException.class)
                 .hasMessage("예약할 좌석이 없습니다.");
     }
@@ -105,7 +105,7 @@ HoldSeatUseCaseTest {
         given(holdSeatIdempotencyCachePort.tryProcess(anyString())).willReturn(true);
 
         // when & then
-        assertThatThrownBy(() -> holdSeatService.execute(emptySeatIdsCommand))
+        assertThatThrownBy(() -> holdSeatService.holdSeat(emptySeatIdsCommand))
                 .isInstanceOf(IllegalArgumentException.class)
                 .hasMessage("예약할 좌석이 없습니다.");
     }
@@ -133,7 +133,7 @@ HoldSeatUseCaseTest {
                 .willReturn(expectedTTL);
 
         // when
-        HoldSeatResult result = holdSeatService.execute(duplicateCommand);
+        HoldSeatResult result = holdSeatService.holdSeat(duplicateCommand);
 
         // then
         assertThat(result.seatIds()).containsExactlyElementsOf(uniqueSeatIds);
@@ -151,7 +151,7 @@ HoldSeatUseCaseTest {
                 .willReturn(expectedTTL);
 
         // when
-        HoldSeatResult result = holdSeatService.execute(command);
+        HoldSeatResult result = holdSeatService.holdSeat(command);
 
         // then
         assertThat(result).isNotNull();
@@ -169,7 +169,7 @@ HoldSeatUseCaseTest {
                 .willReturn(false);
 
         // when & then
-        assertThatThrownBy(() -> holdSeatService.execute(command))
+        assertThatThrownBy(() -> holdSeatService.holdSeat(command))
                 .isInstanceOf(IllegalStateException.class)
                 .hasMessage("다른 사용자가 이미 예약 중인 좌석입니다.");
     }
@@ -200,7 +200,7 @@ HoldSeatUseCaseTest {
                             Long currentUserId = 1000L + num;
                             HoldSeatCommand currentCommand = new HoldSeatCommand("idempotencyKey", scheduleId, seatIds, currentUserId);
                             try {
-                                HoldSeatResult result = holdSeatService.execute(currentCommand);
+                                HoldSeatResult result = holdSeatService.holdSeat(currentCommand);
                                 successCount.incrementAndGet();
                             } catch (IllegalStateException e) {
                                 if ("다른 사용자가 이미 예약 중인 좌석입니다.".equals(e.getMessage())) {
@@ -241,7 +241,7 @@ HoldSeatUseCaseTest {
                             List<Long> uniqueSeats = Arrays.asList(100L + num); // 각 쓰레드마다 다른 좌석
                             // HoldSeatCommand currentCommand = new HoldSeatCommand(scheduleId, seatIds, currentUserId);
                             HoldSeatCommand concurrentCommand = new HoldSeatCommand("idempotencyKey", scheduleId, uniqueSeats, 1000L + num);
-                            HoldSeatResult result = holdSeatService.execute(concurrentCommand);
+                            HoldSeatResult result = holdSeatService.holdSeat(concurrentCommand);
                             successCount.incrementAndGet();
                         }))
                         .toList();
@@ -265,7 +265,7 @@ HoldSeatUseCaseTest {
                 .build();
 
         // when & then
-        assertThatThrownBy(() -> holdSeatService.execute(command))
+        assertThatThrownBy(() -> holdSeatService.holdSeat(command))
                 .isInstanceOf(IllegalArgumentException.class)
                 .hasMessage("요청 식별자(Idempotency Key)가 필요합니다.");
     }
@@ -282,7 +282,7 @@ HoldSeatUseCaseTest {
                 .build();
 
         // when & then
-        assertThatThrownBy(() -> holdSeatService.execute(command))
+        assertThatThrownBy(() -> holdSeatService.holdSeat(command))
                 .isInstanceOf(IllegalArgumentException.class)
                 .hasMessage("요청 식별자(Idempotency Key)가 필요합니다.");
     }
@@ -303,7 +303,7 @@ HoldSeatUseCaseTest {
                 .willReturn(cached);
 
         // when
-        HoldSeatResult result = holdSeatService.execute(command);
+        HoldSeatResult result = holdSeatService.holdSeat(command);
 
         // then
         assertThat(result.scheduleId()).isEqualTo(cached.scheduleId());
@@ -329,7 +329,7 @@ HoldSeatUseCaseTest {
                 .when(holdSeatIdempotencyCachePort).saveResult(anyString(), any(HoldSeatResult.class));
 
         // when & then
-        assertThatThrownBy(() -> holdSeatService.execute(command))
+        assertThatThrownBy(() -> holdSeatService.holdSeat(command))
                 .isInstanceOf(RuntimeException.class)
                 .hasMessageContaining("동시성 문제가 발생했습니다.");
     }

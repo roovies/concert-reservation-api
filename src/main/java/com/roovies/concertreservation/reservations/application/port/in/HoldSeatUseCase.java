@@ -4,5 +4,5 @@ import com.roovies.concertreservation.reservations.application.dto.command.HoldS
 import com.roovies.concertreservation.reservations.application.dto.result.HoldSeatResult;
 
 public interface HoldSeatUseCase {
-    HoldSeatResult execute(HoldSeatCommand command);
+    HoldSeatResult holdSeat(HoldSeatCommand command);
 }

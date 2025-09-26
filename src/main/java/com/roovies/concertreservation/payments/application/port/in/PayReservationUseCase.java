@@ -4,5 +4,5 @@ import com.roovies.concertreservation.payments.application.dto.command.PayReserv
 import com.roovies.concertreservation.payments.application.dto.result.PayReservationResult;
 
 public interface PayReservationUseCase {
-    PayReservationResult execute(PayReservationCommand command);
+    PayReservationResult payReservation(PayReservationCommand command);
 }

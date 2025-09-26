@@ -20,7 +20,7 @@ public class HoldSeatService implements HoldSeatUseCase {
     private final HoldSeatIdempotencyCachePort holdSeatIdempotencyCachePort;
 
     @Override
-    public HoldSeatResult execute(HoldSeatCommand command) {
+    public HoldSeatResult holdSeat(HoldSeatCommand command) {
         String idempotencyKey = command.idempotencyKey();
         Long scheduleId = command.scheduleId();
         List<Long> seatIds = command.seatIds();

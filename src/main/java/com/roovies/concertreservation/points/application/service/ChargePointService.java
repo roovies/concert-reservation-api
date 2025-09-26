@@ -28,7 +28,7 @@ public class ChargePointService implements ChargePointUseCase {
             maxAttempts = 5,                                         // 최대 5번 시도
             backoff = @Backoff(delay = 100, multiplier = 2.0)         // 100ms → 200ms → 400ms ...
     )
-    public ChargePointResult execute(ChargePointCommand command) {
+    public ChargePointResult charge(ChargePointCommand command) {
         Long userId = command.userId();
         Amount chargeAmount = Amount.of(command.amount());
 

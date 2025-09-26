@@ -52,7 +52,7 @@ public class ChargePointConcurrencyTest {
                 IntStream.range(0, threadCount)
                         .mapToObj(i -> CompletableFuture.runAsync(() -> {
                             try {
-                                chargePointService.execute(ChargePointCommand.builder()
+                                chargePointService.charge(ChargePointCommand.builder()
                                                 .userId(userId)
                                                 .amount(chargeAmount)
                                                 .build());

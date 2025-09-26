@@ -1,10 +1,10 @@
 package com.roovies.concertreservation.reservations.infra.adapter.in.web.controller;
 
 import com.roovies.concertreservation.reservations.application.dto.command.HoldSeatCommand;
-import com.roovies.concertreservation.reservations.application.dto.query.GetAvailableSeatsQuery;
+import com.roovies.concertreservation.reservations.application.dto.query.GetAvailableSeatListQuery;
 import com.roovies.concertreservation.reservations.application.dto.result.GetAvailableSeatListResult;
 import com.roovies.concertreservation.reservations.application.dto.result.HoldSeatResult;
-import com.roovies.concertreservation.reservations.application.port.in.GetAvailableSeatsUseCase;
+import com.roovies.concertreservation.reservations.application.port.in.GetAvailableSeatListUseCase;
 import com.roovies.concertreservation.reservations.application.port.in.HoldSeatUseCase;
 import com.roovies.concertreservation.reservations.infra.adapter.in.web.dto.request.CreateReservationRequest;
 import com.roovies.concertreservation.reservations.infra.adapter.in.web.dto.request.GetReservationHistoryRequest;
@@ -40,7 +40,7 @@ import java.util.List;
 @Tag(name = "Reservation API", description = "콘서트 예약 관련 명세서")
 public class ReservationController {
 
-    private final GetAvailableSeatsUseCase getAvailableSeatsUseCase;
+    private final GetAvailableSeatListUseCase getAvailableSeatListUseCase;
     private final HoldSeatUseCase holdSeatUseCase;
 
     @Operation(
@@ -73,12 +73,12 @@ public class ReservationController {
             @PathVariable("concertId") final Long concertId,
             @PathVariable("date") @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) final LocalDate date
     ) {
-        GetAvailableSeatsQuery query = GetAvailableSeatsQuery.builder()
+        GetAvailableSeatListQuery query = GetAvailableSeatListQuery.builder()
                 .concertId(concertId)
                 .date(date)
                 .build();
 
-        GetAvailableSeatListResult result = getAvailableSeatsUseCase.execute(query);
+        GetAvailableSeatListResult result = getAvailableSeatListUseCase.getAvailableSeatList(query);
         List<GetAvailableSeatsResponse.SeatItemDto> availableSeats = result.availableSeats().stream()
                 .map(seat -> GetAvailableSeatsResponse.SeatItemDto.builder()
                         .seatId(seat.seatId())
@@ -150,7 +150,7 @@ public class ReservationController {
                 .seatIds(request.seatIds())
                 .userId(1L)
                 .build();
-        HoldSeatResult result = holdSeatUseCase.execute(command);
+        HoldSeatResult result = holdSeatUseCase.holdSeat(command);
         return ResponseEntity.status(HttpStatus.CREATED).body(
                 CreateReservationResponse.builder()
                         .scheduleId(result.scheduleId())

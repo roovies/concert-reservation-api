@@ -1,8 +1,8 @@
 package com.roovies.concertreservation.concerts.infra.adapter.in.web.controller;
 
-import com.roovies.concertreservation.concerts.application.port.in.GetConcertByIdUseCase;
+import com.roovies.concertreservation.concerts.application.port.in.GetConcertUseCase;
 import com.roovies.concertreservation.concerts.infra.adapter.in.web.dto.request.GetConcertsRequest;
-import com.roovies.concertreservation.concerts.application.dto.result.GetConcertByIdResult;
+import com.roovies.concertreservation.concerts.application.dto.result.GetConcertResult;
 import com.roovies.concertreservation.concerts.application.dto.result.GetConcertListResult;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.media.Content;
@@ -25,7 +25,7 @@ import java.util.List;
 @Tag(name = "Concert API", description = "콘서트 관련 기능 명세서")
 public class ConcertController {
 
-    private final GetConcertByIdUseCase getConcertByIdUseCase;
+    private final GetConcertUseCase getConcertUseCase;
 
     @Operation(
             summary = "콘서트 상세 정보 조회",
@@ -36,7 +36,7 @@ public class ConcertController {
                     @ApiResponse(
                             responseCode = "200",
                             description = "콘서트 상세 정보 조회 성공",
-                            content = @Content(schema = @Schema(implementation = GetConcertByIdResult.class))
+                            content = @Content(schema = @Schema(implementation = GetConcertResult.class))
                     ),
                     @ApiResponse(
                             responseCode = "400",
@@ -53,8 +53,8 @@ public class ConcertController {
             }
     )
     @GetMapping("/{concertId}")
-    public ResponseEntity<GetConcertByIdResult> getConcert(@PathVariable Long concertId) {
-        GetConcertByIdResult concert = getConcertByIdUseCase.execute(concertId);
+    public ResponseEntity<GetConcertResult> getConcert(@PathVariable Long concertId) {
+        GetConcertResult concert = getConcertUseCase.findById(concertId);
         return ResponseEntity.status(HttpStatus.OK).body(concert);
     }
 

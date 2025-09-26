@@ -11,11 +11,11 @@ public record GetAvailableSeatListResult(
         Long concertId,
         Long concertScheduleId,
         LocalDate date,
-        List<SeatInfo> availableSeats,
+        List<SeatItem> availableSeats,
         boolean isAllReserved
 ) {
     @Builder
-    public record SeatInfo(
+    public record SeatItem(
             Long seatId,
             int row,
             int seatNumber,

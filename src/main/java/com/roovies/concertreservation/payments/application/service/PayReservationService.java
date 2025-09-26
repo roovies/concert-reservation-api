@@ -8,8 +8,8 @@ import com.roovies.concertreservation.payments.application.port.in.PayReservatio
 import com.roovies.concertreservation.payments.application.port.out.*;
 import com.roovies.concertreservation.payments.domain.entity.Payment;
 import com.roovies.concertreservation.payments.domain.entity.PaymentIdempotency;
-import com.roovies.concertreservation.payments.domain.external.query.HeldSeatsQuery;
-import com.roovies.concertreservation.payments.domain.external.snapshot.PaymentHeldSeatsSnapShot;
+import com.roovies.concertreservation.payments.application.dto.query.GetHeldSeatListQuery;
+import com.roovies.concertreservation.payments.domain.external.ExternalHeldSeatList;
 import com.roovies.concertreservation.shared.domain.vo.Amount;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -27,21 +27,21 @@ public class PayReservationService implements PayReservationUseCase {
     private final PaymentRepositoryPort paymentRepositoryPort;
     private final PaymentIdempotencyRepositoryPort paymentIdempotencyRepositoryPort;
 
-    private final PaymentReservationQueryPort paymentReservationQueryPort;
-    private final PaymentPointQueryPort paymentPointQueryPort;
+    private final PaymentReservationGatewayPort paymentReservationGatewayPort;
+    private final PaymentPointGatewayPort paymentPointGatewayPort;
     private final PaymentUserGatewayPort paymentUserGatewayPort;
 
     private final ObjectMapper objectMapper;
 
     @Override
-    public PayReservationResult execute(PayReservationCommand command) {
-        HeldSeatsQuery query = HeldSeatsQuery.of(
+    public PayReservationResult payReservation(PayReservationCommand command) {
+        GetHeldSeatListQuery query = GetHeldSeatListQuery.of(
                 command.scheduleId(),
                 command.seatIds(),
                 command.userId()
         );
 
-        PaymentHeldSeatsSnapShot heldSeats = paymentReservationQueryPort.findHeldSeats(query);
+        ExternalHeldSeatList heldSeats = paymentReservationGatewayPort.findHeldSeats(query);
         if (heldSeats.seatIds().isEmpty())
             throw new IllegalStateException("예약 대기 중인 좌석이 없습니다.");
 
@@ -136,9 +136,9 @@ public class PayReservationService implements PayReservationUseCase {
     /**
      * 실제 결제 처리 로직
      */
-    private Payment processPayment(PayReservationCommand command, PaymentHeldSeatsSnapShot heldSeats) {
+    private Payment processPayment(PayReservationCommand command, ExternalHeldSeatList heldSeats) {
         // 실제 보유 포인트 조회 및 결제 가능한지 검증
-        Long currentPoint = paymentPointQueryPort.getUserPoints(command.userId());
+        Long currentPoint = paymentPointGatewayPort.getUserPoints(command.userId());
         if (currentPoint < heldSeats.totalPrice())
             throw new IllegalStateException("결제 금액이 부족합니다.");
 

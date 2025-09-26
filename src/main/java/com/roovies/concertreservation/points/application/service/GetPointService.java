@@ -15,7 +15,7 @@ public class GetPointService implements GetPointUseCase {
     private final PointRepositoryPort pointRepositoryPort;
 
     @Override
-    public Long execute(Long userId) {
+    public Long findById(Long userId) {
         Point point = pointRepositoryPort.findById(userId)
                 .orElseThrow(() -> new NoSuchElementException("포인트 정보가 존재하지 않습니다."));
 

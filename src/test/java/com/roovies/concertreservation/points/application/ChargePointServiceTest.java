@@ -46,7 +46,7 @@ public class ChargePointServiceTest {
                 .willReturn(Optional.empty());
 
         // when & then
-        assertThatThrownBy(() -> chargePointService.execute(command))
+        assertThatThrownBy(() -> chargePointService.charge(command))
                 .isInstanceOf(NoSuchElementException.class)
                 .hasMessage("존재하지 않는 회원입니다.");
     }
@@ -63,7 +63,7 @@ public class ChargePointServiceTest {
                 .willReturn(resultPoint);
 
         // when
-        ChargePointResult result = chargePointService.execute(command);
+        ChargePointResult result = chargePointService.charge(command);
 
         // then
         assertThat(result).isNotNull();
