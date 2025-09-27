@@ -7,7 +7,7 @@ import java.time.LocalDateTime;
 import java.util.List;
 
 @Builder
-public record GetVenueWithSeatsResult(
+public record GetVenueWithSeatListResult(
         Long id,
         String name,
         int totalSeats,

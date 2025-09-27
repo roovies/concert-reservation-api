@@ -2,6 +2,7 @@ package com.roovies.concertreservation.payments.application.service;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.roovies.concertreservation.payments.application.dto.command.ExternalCreateReservationCommand;
 import com.roovies.concertreservation.payments.application.dto.command.PayReservationCommand;
 import com.roovies.concertreservation.payments.application.dto.result.PayReservationResult;
 import com.roovies.concertreservation.payments.application.port.in.PayReservationUseCase;
@@ -10,6 +11,7 @@ import com.roovies.concertreservation.payments.domain.entity.Payment;
 import com.roovies.concertreservation.payments.domain.entity.PaymentIdempotency;
 import com.roovies.concertreservation.payments.application.dto.query.GetHeldSeatListQuery;
 import com.roovies.concertreservation.payments.domain.external.ExternalHeldSeatList;
+import com.roovies.concertreservation.reservations.domain.enums.ReservationStatus;
 import com.roovies.concertreservation.shared.domain.vo.Amount;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -71,6 +73,9 @@ public class PayReservationService implements PayReservationUseCase {
                     .status(result.getStatus())
                     .completedAt(result.getCreatedAt())
                     .build();
+
+            // 결제 성공 시 예약 정보 적재
+            this.saveNewReservation(payReservationResult);
 
             // 성공한 경우 멱등성 정보 갱신
             paymentIdempotencyRepositoryPort.setResult(idempotency, result.getId(), objectMapper.writeValueAsString(payReservationResult));
@@ -162,5 +167,20 @@ public class PayReservationService implements PayReservationUseCase {
         // 남은 포인트 반영
         paymentUserGatewayPort.updateUserPoints(command.userId(), remainingAmount);
         return result;
+    }
+
+    /**
+     * 결제 완료 시 예약 정보 저장
+     */
+    private void saveNewReservation(PayReservationResult payReservationResult) {
+        ExternalCreateReservationCommand command = ExternalCreateReservationCommand.builder()
+                .paymentId(payReservationResult.paymentId())
+                .userId(payReservationResult.userId())
+                .status(ReservationStatus.CONFIRMED)
+                .scheduleId(payReservationResult.scheduleId())
+                .seatIds(payReservationResult.seatIds())
+                .build();
+
+        paymentReservationGatewayPort.saveReservation(command);
     }
 }

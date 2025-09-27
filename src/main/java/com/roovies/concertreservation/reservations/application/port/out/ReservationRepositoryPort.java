@@ -8,4 +8,5 @@ import java.util.Optional;
 public interface ReservationRepositoryPort {
     Optional<Reservation> findById(Long reservationId);
     List<Reservation> findReservationsByDetailScheduleId(Long scheduleId);
+    void save(Reservation reservation);
 }

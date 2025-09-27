@@ -1,10 +1,9 @@
 package com.roovies.concertreservation.reservations.infra.adapter.out.persistence.entity;
 
-import com.roovies.concertreservation.payments.infra.adapter.out.persistence.entity.PaymentJpaEntity;
 import com.roovies.concertreservation.reservations.domain.enums.ReservationStatus;
-import com.roovies.concertreservation.users.infra.adapter.out.persistence.entity.UserJpaEntity;
 import jakarta.persistence.*;
 import lombok.AccessLevel;
+import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 
@@ -21,14 +20,21 @@ public class ReservationJpaEntity {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
-    // 결제 ID (FK) - 예약과 결제는 1:1
-    @OneToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "payment_id", nullable = false)
-    private PaymentJpaEntity paymentJpaEntity;
+    /**
+     * Payment는 다른 BC이므로 식별자만 저장
+     * - DB FK X (물리 DB 분리 고려)
+     * - Reservation → Payment 관계는 API/이벤트/ACL을 통해 연결
+     */
+    @Column(name = "payment_id", nullable = false)
+    private Long paymentId;
 
-    @ManyToOne(fetch = FetchType.LAZY, optional = false)
-    @JoinColumn(name = "user_id", nullable = false)
-    private UserJpaEntity user; // 예약자 (FK)
+    /**
+     * User도 다른 BC이므로 식별자만 저장
+     * - DB FK X (물리 DB 분리 고려)
+     * - Reservation → User 관계는 API/이벤트/ACL을 통해 연결
+     */
+    @Column(name = "user_id", nullable = false)
+    private Long userId;
 
     @Enumerated(EnumType.STRING)
     @Column(name = "status", nullable = false, length = 20)
@@ -45,17 +51,14 @@ public class ReservationJpaEntity {
     @OneToMany(mappedBy = "reservation", cascade = CascadeType.ALL, orphanRemoval = true)
     private List<ReservationDetailJpaEntity> reservationDetails = new ArrayList<>();
 
-    // 결제 정보 (1:1)
-//    @OneToOne(mappedBy = "reservation", cascade = CascadeType.ALL, orphanRemoval = true)
-//    private PaymentJpaEntity payment;
-
-//    public void addReservationDetail(ReservationDetailJpaEntity detail) {
-//        reservationDetails.add(detail);
-//        detail.setReservation(this);
-//    }
-//
-//    public void setPayment(Payment payment) {
-//        this.payment = payment;
-//        payment.setReservation(this);
-//    }
+    @Builder
+    ReservationJpaEntity(Long id, Long paymentId, Long userId, ReservationStatus status, LocalDateTime createdAt, LocalDateTime updatedAt, List<ReservationDetailJpaEntity> reservationDetails) {
+        this.id = id;
+        this.paymentId = paymentId;
+        this.userId = userId;
+        this.status = status;
+        this.createdAt = createdAt;
+        this.updatedAt = updatedAt;
+        this.reservationDetails = reservationDetails;
+    }
 }
