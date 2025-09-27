@@ -3,6 +3,7 @@ package com.roovies.concertreservation.reservations.infra.adapter.out.persistenc
 import com.roovies.concertreservation.reservations.application.port.out.ReservationRepositoryPort;
 import com.roovies.concertreservation.reservations.domain.entity.Reservation;
 import com.roovies.concertreservation.reservations.domain.entity.ReservationDetail;
+import com.roovies.concertreservation.reservations.infra.adapter.out.persistence.entity.ReservationDetailJpaEntity;
 import com.roovies.concertreservation.reservations.infra.adapter.out.persistence.entity.ReservationJpaEntity;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Repository;
@@ -27,8 +28,8 @@ public class ReservationRepositoryAdapter implements ReservationRepositoryPort {
             return Optional.of(
                     Reservation.create(
                             reservation.getId(),
-                            reservation.getUser().getId(),
-                            reservation.getPaymentJpaEntity().getId(),
+                            reservation.getUserId(),
+                            reservation.getPaymentId(),
                             reservation.getStatus(),
                             reservation.getCreatedAt(),
                             reservation.getUpdatedAt(),
@@ -53,15 +54,15 @@ public class ReservationRepositoryAdapter implements ReservationRepositoryPort {
                             .map(detailEntity -> ReservationDetail.create(
                                     detailEntity.getId(),
                                     detailEntity.getReservation().getId(),
-                                    detailEntity.getSchedule().getId(),
-                                    detailEntity.getSeat().getId()
+                                    detailEntity.getScheduleId(),
+                                    detailEntity.getSeatId()
                             ))
                             .toList();
 
                     return Reservation.create(
                             entity.getId(),
-                            entity.getUser().getId(),
-                            entity.getPaymentJpaEntity().getId(),
+                            entity.getUserId(),
+                            entity.getPaymentId(),
                             entity.getStatus(),
                             entity.getCreatedAt(),
                             entity.getUpdatedAt(),
@@ -69,5 +70,33 @@ public class ReservationRepositoryAdapter implements ReservationRepositoryPort {
                     );
                 })
                 .toList();
+    }
+
+    @Override
+    public void save(Reservation reservation) {
+        List<ReservationDetailJpaEntity> details = new ArrayList<>();
+
+        // Reservation 설정 (detail은 참조값만 할당)
+        ReservationJpaEntity reservationJpaEntity = ReservationJpaEntity.builder()
+                .paymentId(reservation.getPaymentId())
+                .userId(reservation.getUserId())
+                .status(reservation.getStatus())
+                .createdAt(reservation.getCreatedAt())
+                .reservationDetails(details)
+                .build();
+
+        // Reservation Detail 설정 (참조값 객체 적재)
+        for (ReservationDetail detail : reservation.getDetails()) {
+            ReservationDetailJpaEntity detailJpaEntity = ReservationDetailJpaEntity.builder()
+                    .reservation(reservationJpaEntity)
+                    .scheduleId(detail.getScheduleId())
+                    .seatId(detail.getSeatId())
+                    .build();
+
+            details.add(detailJpaEntity);
+        }
+
+        // 일괄 저장 (cascade로 인하여 details도 함께 저장)
+        reservationJpaRepository.save(reservationJpaEntity);
     }
 }

@@ -17,8 +17,7 @@ public interface ReservationJpaRepository extends JpaRepository<ReservationJpaEn
 
     @Query("SELECT DISTINCT r FROM ReservationJpaEntity r " +
             "LEFT JOIN FETCH r.reservationDetails rd " +
-            "LEFT JOIN FETCH r.user " +
             "WHERE r.id IN (SELECT DISTINCT rd2.reservation.id FROM ReservationDetailJpaEntity rd2 " +
-            "WHERE rd2.schedule.id = :scheduleId)")
+            "WHERE rd2.scheduleId = :scheduleId)")
     List<ReservationJpaEntity> findByDetailScheduleIdWithDetails(@Param("scheduleId") Long scheduleId);
 }
