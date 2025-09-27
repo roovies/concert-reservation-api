@@ -23,9 +23,13 @@ public class ConcertScheduleJpaEntity {
     @JoinColumn(name = "concert_id", nullable = false)
     private ConcertJpaEntity concert;
 
-    @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "venue_id", nullable = false)
-    private VenueJpaEntity venue;
+    /**
+     * Venue는 다른 BC이므로 식별자만 저장
+     * - DB FK X (물리 DB 분리 고려)
+     * - ConcertSchedule → Venue 관계는 API/이벤트/ACL을 통해 연결
+     */
+    @Column(name = "venue_id", nullable = false)
+    private Long venueId;
 
     @Column(name = "schedule_date", nullable = false)
     private LocalDate scheduleDate;

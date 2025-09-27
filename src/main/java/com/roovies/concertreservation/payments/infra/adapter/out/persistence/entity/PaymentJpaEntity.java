@@ -2,7 +2,6 @@ package com.roovies.concertreservation.payments.infra.adapter.out.persistence.en
 
 import com.roovies.concertreservation.payments.domain.entity.Payment;
 import com.roovies.concertreservation.payments.domain.enums.PaymentStatus;
-import com.roovies.concertreservation.reservations.infra.adapter.out.persistence.entity.ReservationJpaEntity;
 import jakarta.persistence.*;
 import lombok.AccessLevel;
 import lombok.Getter;
@@ -18,8 +17,6 @@ public class PaymentJpaEntity {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
-
-
 
     @Column(name = "original_amount", nullable = false)
     private Long originalAmount;
