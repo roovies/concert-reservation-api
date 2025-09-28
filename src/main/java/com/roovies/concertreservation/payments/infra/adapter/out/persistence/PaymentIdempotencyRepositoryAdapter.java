@@ -54,27 +54,27 @@ public class PaymentIdempotencyRepositoryAdapter implements PaymentIdempotencyRe
     }
 
     @Override
-    public void setResult(PaymentIdempotency idempotency, Long paymentId, String result) {
+    public void setResult(String idempotencyKey, Long paymentId, String result) {
         // 멱등성 엔티티 업데이트
-        PaymentIdempotencyJpaEntity entity = paymentIdempotencyJpaRepository.findById(idempotency.getKey())
-                .orElseThrow(() -> new IllegalArgumentException("멱등성 키를 찾을 수 없습니다: " + idempotency.getKey()));
+        PaymentIdempotencyJpaEntity entity = paymentIdempotencyJpaRepository.findById(idempotencyKey)
+                .orElseThrow(() -> new IllegalArgumentException("멱등성 키를 찾을 수 없습니다: " + idempotencyKey));
 
         entity.updateResult(paymentId, result);
 
         paymentIdempotencyJpaRepository.save(entity);
         log.info("멱등성 키 처리 완료: idempotencyKey={}, paymentId={}",
-                idempotency.getKey(), paymentId);
+                idempotencyKey, paymentId);
     }
 
     @Override
-    public void setFailed(PaymentIdempotency idempotency, String failureReason) {
-        PaymentIdempotencyJpaEntity entity = paymentIdempotencyJpaRepository.findById(idempotency.getKey())
-                .orElseThrow(() -> new IllegalArgumentException("멱등성 키를 찾을 수 없습니다: " + idempotency.getKey()));
+    public void setFailed(String idempotencyKey, String failureReason) {
+        PaymentIdempotencyJpaEntity entity = paymentIdempotencyJpaRepository.findById(idempotencyKey)
+                .orElseThrow(() -> new IllegalArgumentException("멱등성 키를 찾을 수 없습니다: " + idempotencyKey));
 
         entity.updateFailed(failureReason);
 
         paymentIdempotencyJpaRepository.save(entity);
         log.warn("멱등성 키 처리 실패: idempotencyKey={}, reason={}",
-                idempotency.getKey(), failureReason);
+                idempotencyKey, failureReason);
     }
 }

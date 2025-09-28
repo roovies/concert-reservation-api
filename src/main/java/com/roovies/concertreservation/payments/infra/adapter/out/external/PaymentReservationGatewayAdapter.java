@@ -7,7 +7,7 @@ import com.roovies.concertreservation.payments.domain.external.ExternalHeldSeatL
 import com.roovies.concertreservation.reservations.application.dto.command.CreateReservationCommand;
 import com.roovies.concertreservation.reservations.application.dto.result.HoldSeatResult;
 import com.roovies.concertreservation.reservations.application.port.in.CreateReservationUseCase;
-import com.roovies.concertreservation.reservations.application.port.in.GetHeldSeatListUseCase;
+import com.roovies.concertreservation.reservations.application.port.in.GetMyHeldSeatListUseCase;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Component;
 
@@ -16,7 +16,7 @@ import org.springframework.stereotype.Component;
 @RequiredArgsConstructor
 public class PaymentReservationGatewayAdapter implements PaymentReservationGatewayPort {
 
-    private final GetHeldSeatListUseCase getHeldSeatListUseCase;
+    private final GetMyHeldSeatListUseCase getMyHeldSeatListUseCase;
     private final CreateReservationUseCase createReservationUseCase;
 
     @Override
@@ -28,7 +28,7 @@ public class PaymentReservationGatewayAdapter implements PaymentReservationGatew
                 .userId(query.userId())
                 .build();
 
-        HoldSeatResult result = getHeldSeatListUseCase.getHeldSeatList(externalQuery);
+        HoldSeatResult result = getMyHeldSeatListUseCase.getMyHeldSeatList(externalQuery);
         return ExternalHeldSeatList.of(
                 result.scheduleId(),
                 result.seatIds(),
