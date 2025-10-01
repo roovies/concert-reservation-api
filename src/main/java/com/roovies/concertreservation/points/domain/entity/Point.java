@@ -44,7 +44,7 @@ public class Point {
         this.updatedAt = LocalDateTime.now();
     }
 
-    public void use(Amount other) {
+    public void deduct(Amount other) {
         if (!this.amount.isGreaterThanOrEqual(other))
             throw new IllegalArgumentException("포인트가 부족합니다.");
 
