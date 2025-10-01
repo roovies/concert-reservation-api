@@ -219,11 +219,6 @@ public class PayReservationService implements PayReservationUseCase {
      * @throws IllegalStateException 결제 포인트 부족 시
      */
     private Payment payReservation(Long userId, Long payForAmount, Long discountAmount, Long totalPrice) {
-        // 실제 보유 포인트 조회 및 결제 가능한지 검증
-        Long currentPoint = paymentPointGatewayPort.getUserPoints(userId);
-        if (currentPoint < totalPrice)
-            throw new IllegalStateException("결제 금액이 부족합니다.");
-
         // 결제 객체 만들기
         Payment payment = Payment.create(
                 userId,
@@ -235,15 +230,11 @@ public class PayReservationService implements PayReservationUseCase {
         if (discountAmount > 0)
             payment.discount(Amount.of(discountAmount));
 
-        // 최종 결제 후 남은 포인트 계산
-        Long remainingAmount = currentPoint - payment.getPaidAmount().value();
+        // 포인트 차감
+        Long resultAmount = paymentPointGatewayPort.deductPoint(userId, totalPrice);
 
         // 결제 정보 저장
-        Payment result = paymentCommandRepositoryPort.save(payment);
-
-        // 남은 포인트 반영
-        paymentUserGatewayPort.updateUserPoints(userId, remainingAmount);
-        return result;
+        return paymentCommandRepositoryPort.save(payment);
     }
 
     /**
