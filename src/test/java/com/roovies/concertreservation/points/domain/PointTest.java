@@ -114,7 +114,7 @@ public class PointTest {
         Amount useAmount = Amount.of(1000);
 
         // then
-        point.use(useAmount);
+        point.deduct(useAmount);
 
         // then
         assertThat(point.getAmount()).isEqualTo(Amount.of(0));
@@ -127,7 +127,7 @@ public class PointTest {
         Amount useAmount = Amount.of(1001);
 
         // when & then
-        assertThatThrownBy(() -> point.use(useAmount))
+        assertThatThrownBy(() -> point.deduct(useAmount))
                 .isInstanceOf(IllegalArgumentException.class)
                 .hasMessage("포인트가 부족합니다.");
     }
