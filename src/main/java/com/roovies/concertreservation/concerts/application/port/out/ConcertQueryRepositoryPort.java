@@ -4,7 +4,7 @@ import com.roovies.concertreservation.concerts.domain.entity.Concert;
 
 import java.util.Optional;
 
-public interface ConcertRepositoryPort {
+public interface ConcertQueryRepositoryPort {
     Optional<Concert> findById(Long concertId);
     Optional<Concert> findByIdWithSchedules(Long concertId);
 }

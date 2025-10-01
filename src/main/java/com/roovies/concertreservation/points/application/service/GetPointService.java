@@ -1,7 +1,7 @@
 package com.roovies.concertreservation.points.application.service;
 
 import com.roovies.concertreservation.points.application.port.in.GetPointUseCase;
-import com.roovies.concertreservation.points.application.port.out.PointRepositoryPort;
+import com.roovies.concertreservation.points.application.port.out.PointQueryRepositoryPort;
 import com.roovies.concertreservation.points.domain.entity.Point;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -21,7 +21,7 @@ import java.util.NoSuchElementException;
 @Transactional(readOnly = true)
 public class GetPointService implements GetPointUseCase {
 
-    private final PointRepositoryPort pointRepositoryPort;
+    private final PointQueryRepositoryPort pointQueryRepositoryPort;
 
     /**
      * 특정 사용자의 포인트를 조회한다.
@@ -38,7 +38,7 @@ public class GetPointService implements GetPointUseCase {
     public Long findById(Long userId) {
         log.info("[GetPointService] 포인트 정보 조회 - userId: {}", userId);
 
-        Point point = pointRepositoryPort.findById(userId)
+        Point point = pointQueryRepositoryPort.findById(userId)
                 .orElseThrow(() -> new NoSuchElementException("포인트 정보가 존재하지 않습니다."));
         return point.getAmount().value();
     }

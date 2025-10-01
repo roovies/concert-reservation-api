@@ -1,8 +1,7 @@
 package com.roovies.concertreservation.users.infra.adapter.out.persistence;
 
-import com.roovies.concertreservation.users.application.port.out.UserRepositoryPort;
+import com.roovies.concertreservation.users.application.port.out.UserQueryRepositoryPort;
 import com.roovies.concertreservation.users.domain.entity.User;
-import com.roovies.concertreservation.users.domain.vo.Email;
 import com.roovies.concertreservation.users.infra.adapter.out.persistence.entity.UserJpaEntity;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Repository;
@@ -11,7 +10,7 @@ import java.util.Optional;
 
 @Repository
 @RequiredArgsConstructor
-public class UserRepositoryAdapter implements UserRepositoryPort {
+public class UserQueryRepositoryAdapter implements UserQueryRepositoryPort {
     private final UserJpaRepository userJpaRepository;
 
     @Override

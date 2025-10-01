@@ -1,6 +1,6 @@
 package com.roovies.concertreservation.venues.infra.adapter.out.persistence;
 
-import com.roovies.concertreservation.venues.application.port.out.VenueRepositoryPort;
+import com.roovies.concertreservation.venues.application.port.out.VenueQueryRepositoryPort;
 import com.roovies.concertreservation.venues.domain.entity.Venue;
 import com.roovies.concertreservation.venues.domain.entity.VenueSeat;
 import com.roovies.concertreservation.venues.domain.vo.Money;
@@ -14,7 +14,7 @@ import java.util.Optional;
 
 @Repository
 @RequiredArgsConstructor
-public class VenueRepositoryAdapter implements VenueRepositoryPort {
+public class VenueQueryRepositoryAdapter implements VenueQueryRepositoryPort {
     private final VenueJpaRepository venueJpaRepository;
     private final VenueSeatJpaRepository venueSeatJpaRepository;
 

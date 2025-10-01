@@ -3,7 +3,7 @@ package com.roovies.concertreservation.concerts.application.service.query;
 import com.roovies.concertreservation.concerts.application.dto.result.GetConcertResult;
 import com.roovies.concertreservation.concerts.application.port.in.GetConcertUseCase;
 import com.roovies.concertreservation.concerts.application.port.out.ConcertVenueGatewayPort;
-import com.roovies.concertreservation.concerts.application.port.out.ConcertRepositoryPort;
+import com.roovies.concertreservation.concerts.application.port.out.ConcertQueryRepositoryPort;
 import com.roovies.concertreservation.concerts.domain.entity.Concert;
 import com.roovies.concertreservation.concerts.domain.external.ExternalVenue;
 import lombok.RequiredArgsConstructor;
@@ -17,7 +17,7 @@ import java.util.NoSuchElementException;
 @RequiredArgsConstructor
 public class GetConcertService implements GetConcertUseCase {
 
-    private final ConcertRepositoryPort concertRepositoryPort;
+    private final ConcertQueryRepositoryPort concertQueryRepositoryPort;
     private final ConcertVenueGatewayPort concertVenueGatewayPort;
     private final Clock clock; // LocalDate.now()를 Mocking으로 테스팅하기 위함
 
@@ -27,7 +27,7 @@ public class GetConcertService implements GetConcertUseCase {
         if (concertId == null || concertId < 1L)
             throw new IllegalArgumentException("유효하지 않은 콘서트ID입니다.");
 
-        Concert concert = concertRepositoryPort.findByIdWithSchedules(concertId)
+        Concert concert = concertQueryRepositoryPort.findByIdWithSchedules(concertId)
                 .orElseThrow(() -> new NoSuchElementException("콘서트를 찾을 수 없습니다."));
 
         Long venueId = concert.getSchedule(concert.getStartDate()).getVenueId();

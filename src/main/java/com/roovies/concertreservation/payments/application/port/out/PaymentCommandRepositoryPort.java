@@ -2,7 +2,7 @@ package com.roovies.concertreservation.payments.application.port.out;
 
 import com.roovies.concertreservation.payments.domain.entity.Payment;
 
-public interface PaymentRepositoryPort {
+public interface PaymentCommandRepositoryPort {
 
     Payment save(Payment payment);
 }

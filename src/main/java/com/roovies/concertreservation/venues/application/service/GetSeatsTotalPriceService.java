@@ -1,9 +1,8 @@
 package com.roovies.concertreservation.venues.application.service;
 
 import com.roovies.concertreservation.venues.application.port.in.GetSeatsTotalPriceUseCase;
-import com.roovies.concertreservation.venues.application.port.out.VenueRepositoryPort;
+import com.roovies.concertreservation.venues.application.port.out.VenueQueryRepositoryPort;
 import lombok.RequiredArgsConstructor;
-import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -20,7 +19,7 @@ import java.util.List;
 @Transactional(readOnly = true)
 public class GetSeatsTotalPriceService implements GetSeatsTotalPriceUseCase {
 
-    private final VenueRepositoryPort venueRepositoryPort;
+    private final VenueQueryRepositoryPort venueQueryRepositoryPort;
 
     @Override
     public Long getSeatListTotalPrice(List<Long> seatIds) {
@@ -28,6 +27,6 @@ public class GetSeatsTotalPriceService implements GetSeatsTotalPriceUseCase {
             return 0L;
         }
 
-        return venueRepositoryPort.getTotalSeatsPrice(seatIds);
+        return venueQueryRepositoryPort.getTotalSeatsPrice(seatIds);
     }
 }

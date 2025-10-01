@@ -2,10 +2,9 @@ package com.roovies.concertreservation.venues.application.service;
 
 import com.roovies.concertreservation.venues.application.dto.result.GetVenueResult;
 import com.roovies.concertreservation.venues.application.port.in.GetVenueUseCase;
-import com.roovies.concertreservation.venues.application.port.out.VenueRepositoryPort;
+import com.roovies.concertreservation.venues.application.port.out.VenueQueryRepositoryPort;
 import com.roovies.concertreservation.venues.domain.entity.Venue;
 import lombok.RequiredArgsConstructor;
-import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -22,11 +21,11 @@ import java.util.NoSuchElementException;
 @Transactional(readOnly = true)
 public class GetVenueService implements GetVenueUseCase {
 
-    private final VenueRepositoryPort venueRepositoryPort;
+    private final VenueQueryRepositoryPort venueQueryRepositoryPort;
 
     @Override
     public GetVenueResult findById(Long venueId) {
-        Venue venue = venueRepositoryPort.findById(venueId)
+        Venue venue = venueQueryRepositoryPort.findById(venueId)
                 .orElseThrow(() -> new NoSuchElementException("공연장을 찾을 수 없습니다."));
         return GetVenueResult.builder()
                 .id(venue.getId())

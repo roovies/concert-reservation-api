@@ -1,6 +1,6 @@
 package com.roovies.concertreservation.points.infra.adapter.out.persistence;
 
-import com.roovies.concertreservation.points.application.port.out.PointRepositoryPort;
+import com.roovies.concertreservation.points.application.port.out.PointCommandRepositoryPort;
 import com.roovies.concertreservation.points.domain.entity.Point;
 import com.roovies.concertreservation.points.infra.adapter.out.persistence.entity.PointJpaEntity;
 import com.roovies.concertreservation.shared.domain.vo.Amount;
@@ -12,7 +12,7 @@ import java.util.Optional;
 
 @Repository
 @RequiredArgsConstructor
-public class PointRepositoryAdapter implements PointRepositoryPort {
+public class PointCommandRepositoryAdapter implements PointCommandRepositoryPort {
 
     private final PointJpaRepository pointJpaRepository;
 

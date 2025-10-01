@@ -3,7 +3,7 @@ package com.roovies.concertreservation.concerts.application;
 import com.roovies.concertreservation.concerts.application.dto.result.GetConcertResult;
 import com.roovies.concertreservation.concerts.application.port.out.ConcertVenueGatewayPort;
 import com.roovies.concertreservation.concerts.application.service.query.GetConcertService;
-import com.roovies.concertreservation.concerts.application.port.out.ConcertRepositoryPort;
+import com.roovies.concertreservation.concerts.application.port.out.ConcertQueryRepositoryPort;
 import com.roovies.concertreservation.concerts.domain.entity.Concert;
 import com.roovies.concertreservation.concerts.domain.entity.ConcertSchedule;
 import com.roovies.concertreservation.concerts.domain.enums.ScheduleStatus;
@@ -26,7 +26,7 @@ import static org.mockito.BDDMockito.*;
 public class GetConcertUseCaseTest {
 
     @Mock
-    private ConcertRepositoryPort concertRepositoryPort;
+    private ConcertQueryRepositoryPort concertQueryRepositoryPort;
 
     @Mock
     private ConcertVenueGatewayPort concertVenueGatewayPort;
@@ -41,7 +41,7 @@ public class GetConcertUseCaseTest {
     void 존재하지_않는_콘서트ID로_조회시_예외가_발생해야_한다() {
         // given
         Long invalidConcertId = 999L;
-        given(concertRepositoryPort.findByIdWithSchedules(invalidConcertId))
+        given(concertQueryRepositoryPort.findByIdWithSchedules(invalidConcertId))
                 .willReturn(Optional.empty());
 
         // when & then
@@ -104,7 +104,7 @@ public class GetConcertUseCaseTest {
         ));
         concert.setSchedules(schedules);
 
-        given(concertRepositoryPort.findByIdWithSchedules(1L))
+        given(concertQueryRepositoryPort.findByIdWithSchedules(1L))
                 .willReturn(Optional.of(concert));
 
         // 공연장 정보 Mocking

@@ -2,7 +2,7 @@ package com.roovies.concertreservation.points.application;
 
 import com.roovies.concertreservation.points.application.dto.command.ChargePointCommand;
 import com.roovies.concertreservation.points.application.dto.result.ChargePointResult;
-import com.roovies.concertreservation.points.application.port.out.PointRepositoryPort;
+import com.roovies.concertreservation.points.application.port.out.PointCommandRepositoryPort;
 import com.roovies.concertreservation.points.application.service.ChargePointService;
 import com.roovies.concertreservation.points.domain.entity.Point;
 import com.roovies.concertreservation.shared.domain.vo.Amount;
@@ -24,7 +24,7 @@ import static org.mockito.BDDMockito.*;
 public class ChargePointServiceTest {
 
     @Mock
-    private PointRepositoryPort pointRepositoryPort;
+    private PointCommandRepositoryPort pointCommandRepositoryPort;
 
     @InjectMocks
     private ChargePointService chargePointService;
@@ -42,7 +42,7 @@ public class ChargePointServiceTest {
     @Test
     void 존재하지_않는_회원일_경우_예외가_발생해야_한다() {
         // given
-        given(pointRepositoryPort.findById(command.userId()))
+        given(pointCommandRepositoryPort.findById(command.userId()))
                 .willReturn(Optional.empty());
 
         // when & then
@@ -55,11 +55,11 @@ public class ChargePointServiceTest {
     void 보유_포인트가_0일_때_포인트_충전_시_결과는_충전금액이어야_한다() {
         // given
         Point storedPoint = Point.create(command.userId(), Amount.of(0), null);
-        given(pointRepositoryPort.findById(command.userId()))
+        given(pointCommandRepositoryPort.findById(command.userId()))
                 .willReturn(Optional.of(storedPoint));
 
         Point resultPoint = Point.create(command.userId(), Amount.of(command.amount()), LocalDateTime.of(2025, 9, 16, 17, 30));
-        given(pointRepositoryPort.save(storedPoint))
+        given(pointCommandRepositoryPort.save(storedPoint))
                 .willReturn(resultPoint);
 
         // when

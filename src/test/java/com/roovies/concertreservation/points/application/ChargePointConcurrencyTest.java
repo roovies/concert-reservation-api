@@ -1,7 +1,7 @@
 package com.roovies.concertreservation.points.application;
 
 import com.roovies.concertreservation.points.application.dto.command.ChargePointCommand;
-import com.roovies.concertreservation.points.application.port.out.PointRepositoryPort;
+import com.roovies.concertreservation.points.application.port.out.PointCommandRepositoryPort;
 import com.roovies.concertreservation.points.application.service.ChargePointService;
 import com.roovies.concertreservation.points.domain.entity.Point;
 import com.roovies.concertreservation.shared.domain.vo.Amount;
@@ -28,12 +28,12 @@ public class ChargePointConcurrencyTest {
     private ChargePointService chargePointService;
 
     @Autowired
-    private PointRepositoryPort pointRepositoryPort;
+    private PointCommandRepositoryPort pointCommandRepositoryPort;
 
     @BeforeEach
     void setUp() {
         // 각 테스트 전에 데이터 정리
-        pointRepositoryPort.deleteAll();
+        pointCommandRepositoryPort.deleteAll();
     }
 
     @Test
@@ -42,7 +42,7 @@ public class ChargePointConcurrencyTest {
         // 초기 회원 데이터 저장
         Long userId = 1L;
         Point initialPoint = Point.create(userId, Amount.of(1000L), LocalDateTime.now());
-        pointRepositoryPort.save(initialPoint);
+        pointCommandRepositoryPort.save(initialPoint);
 
         int threadCount = 50;
         long chargeAmount = 100L;
@@ -66,7 +66,7 @@ public class ChargePointConcurrencyTest {
         CompletableFuture.allOf(futures.toArray(new CompletableFuture[0])).join();
 
         // then
-        Optional<Point> result = pointRepositoryPort.findById(userId);
+        Optional<Point> result = pointCommandRepositoryPort.findById(userId);
         if (result.isPresent()) {
             Point point = result.get();
             long expectedAmount = 1000L + (threadCount * chargeAmount); // 6000L

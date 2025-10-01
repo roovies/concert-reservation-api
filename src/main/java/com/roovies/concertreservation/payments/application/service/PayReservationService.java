@@ -34,7 +34,7 @@ import java.util.NoSuchElementException;
 @Transactional
 public class PayReservationService implements PayReservationUseCase {
 
-    private final PaymentRepositoryPort paymentRepositoryPort;
+    private final PaymentCommandRepositoryPort paymentCommandRepositoryPort;
     private final PaymentIdempotencyRepositoryPort paymentIdempotencyRepositoryPort;
 
     private final PaymentReservationGatewayPort paymentReservationGatewayPort;
@@ -239,7 +239,7 @@ public class PayReservationService implements PayReservationUseCase {
         Long remainingAmount = currentPoint - payment.getPaidAmount().value();
 
         // 결제 정보 저장
-        Payment result = paymentRepositoryPort.save(payment);
+        Payment result = paymentCommandRepositoryPort.save(payment);
 
         // 남은 포인트 반영
         paymentUserGatewayPort.updateUserPoints(userId, remainingAmount);

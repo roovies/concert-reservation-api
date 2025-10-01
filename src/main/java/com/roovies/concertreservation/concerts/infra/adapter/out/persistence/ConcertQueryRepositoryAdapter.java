@@ -1,6 +1,6 @@
 package com.roovies.concertreservation.concerts.infra.adapter.out.persistence;
 
-import com.roovies.concertreservation.concerts.application.port.out.ConcertRepositoryPort;
+import com.roovies.concertreservation.concerts.application.port.out.ConcertQueryRepositoryPort;
 import com.roovies.concertreservation.concerts.domain.entity.Concert;
 import com.roovies.concertreservation.concerts.domain.entity.ConcertSchedule;
 import com.roovies.concertreservation.concerts.infra.adapter.out.persistence.entity.ConcertJpaEntity;
@@ -12,7 +12,7 @@ import java.util.Optional;
 
 @Repository
 @RequiredArgsConstructor
-public class ConcertRepositoryAdapter implements ConcertRepositoryPort {
+public class ConcertQueryRepositoryAdapter implements ConcertQueryRepositoryPort {
 
     private final ConcertJpaRepository concertJpaRepository;
     private final ConcertScheduleJpaRepository concertScheduleJpaRepository;

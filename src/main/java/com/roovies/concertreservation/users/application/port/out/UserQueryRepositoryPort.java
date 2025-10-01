@@ -4,6 +4,6 @@ import com.roovies.concertreservation.users.domain.entity.User;
 
 import java.util.Optional;
 
-public interface UserRepositoryPort {
+public interface UserQueryRepositoryPort {
     Optional<User> findById(Long id);
 }

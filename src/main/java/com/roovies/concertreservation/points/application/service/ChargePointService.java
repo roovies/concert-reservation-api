@@ -3,7 +3,7 @@ package com.roovies.concertreservation.points.application.service;
 import com.roovies.concertreservation.points.application.dto.command.ChargePointCommand;
 import com.roovies.concertreservation.points.application.dto.result.ChargePointResult;
 import com.roovies.concertreservation.points.application.port.in.ChargePointUseCase;
-import com.roovies.concertreservation.points.application.port.out.PointRepositoryPort;
+import com.roovies.concertreservation.points.application.port.out.PointCommandRepositoryPort;
 import com.roovies.concertreservation.points.domain.entity.Point;
 import com.roovies.concertreservation.shared.domain.vo.Amount;
 import lombok.RequiredArgsConstructor;
@@ -28,7 +28,7 @@ import java.util.NoSuchElementException;
 @Transactional
 public class ChargePointService implements ChargePointUseCase {
 
-    private final PointRepositoryPort pointRepositoryPort;
+    private final PointCommandRepositoryPort pointCommandRepositoryPort;
 
     /**
      * 사용자의 포인트를 충전한다.
@@ -54,11 +54,11 @@ public class ChargePointService implements ChargePointUseCase {
         log.info("[ChargePointService] 포인트 충전 시작 - userId: {}, chargeAmount: {}",
                 userId, chargeAmount);
 
-        Point point = pointRepositoryPort.findById(userId)
+        Point point = pointCommandRepositoryPort.findById(userId)
                 .orElseThrow(() -> new NoSuchElementException("존재하지 않는 회원입니다."));
         point.charge(chargeAmount);
 
-        Point result = pointRepositoryPort.save(point);
+        Point result = pointCommandRepositoryPort.save(point);
 
         log.info("[ChargePointService] 포인트 충전 성공 - userId: {}, chargeAmount: {}, totalAmount: {}",
                 userId, chargeAmount, result.getAmount());

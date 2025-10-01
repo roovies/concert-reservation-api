@@ -1,6 +1,6 @@
 package com.roovies.concertreservation.payments.infra.adapter.out.persistence;
 
-import com.roovies.concertreservation.payments.application.port.out.PaymentRepositoryPort;
+import com.roovies.concertreservation.payments.application.port.out.PaymentCommandRepositoryPort;
 import com.roovies.concertreservation.payments.domain.entity.Payment;
 import com.roovies.concertreservation.payments.infra.adapter.out.persistence.entity.PaymentJpaEntity;
 import com.roovies.concertreservation.shared.domain.vo.Amount;
@@ -9,7 +9,7 @@ import org.springframework.stereotype.Repository;
 
 @Repository
 @RequiredArgsConstructor
-public class PaymentRepositoryAdapter implements PaymentRepositoryPort {
+public class PaymentCommandRepositoryAdapter implements PaymentCommandRepositoryPort {
 
     private final PaymentJpaRepository paymentJpaRepository;
 
