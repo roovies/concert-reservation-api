@@ -27,4 +27,14 @@ public class ReservationWaitingEmitterRepositoryAdapter implements EmitterReposi
     public void removeEmitterByUserKey(String userKey) {
         emitterMap.remove(userKey);
     }
+
+    @Override
+    public boolean containsEmitterByUserKey(String userKey) {
+        return emitterMap.containsKey(userKey);
+    }
+
+    @Override
+    public SseEmitter getEmitterByUserKey(String userKey) {
+        return emitterMap.get(userKey);
+    }
 }

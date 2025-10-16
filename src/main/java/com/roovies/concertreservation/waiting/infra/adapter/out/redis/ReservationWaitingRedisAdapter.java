@@ -9,6 +9,8 @@ import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.stereotype.Repository;
 
 import java.time.Duration;
+import java.util.Collection;
+import java.util.Set;
 
 @Slf4j
 @Repository
@@ -88,6 +90,25 @@ public class ReservationWaitingRedisAdapter implements WaitingCachePort {
         }
 
         return result;
+    }
+
+    @Override
+    public Set<String> getActiveWaitingScheduleIds() {
+        RSet<String> activeWaitingScheduleIds = redisson.getSet(ACTIVE_WAITING_PREFIX);
+        return activeWaitingScheduleIds.readAll();
+    }
+
+    @Override
+    public Collection<String> getActiveWaitingUserKeys(Long scheduleId) {
+        String key = WAITING_PREFIX + scheduleId;
+        RScoredSortedSet<String> waitingQueue = redisson.getScoredSortedSet(key);
+        return waitingQueue.readAll();
+    }
+
+    @Override
+    public void removeActiveWaitingScheduleId(Long scheduleId) {
+        RSet<String> activeWaitingScheduleIds = redisson.getSet(ACTIVE_WAITING_PREFIX);
+        activeWaitingScheduleIds.remove(scheduleId);
     }
 
     private void addActiveQueue(Long scheduleId) {

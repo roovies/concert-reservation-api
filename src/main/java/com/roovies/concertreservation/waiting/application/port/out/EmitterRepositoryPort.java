@@ -6,4 +6,6 @@ public interface EmitterRepositoryPort {
 
     void saveEmitterByUserKey(String userKey, SseEmitter emitter);
     void removeEmitterByUserKey(String userKey);
+    boolean containsEmitterByUserKey(String userKey);
+    SseEmitter getEmitterByUserKey(String userKey);
 }

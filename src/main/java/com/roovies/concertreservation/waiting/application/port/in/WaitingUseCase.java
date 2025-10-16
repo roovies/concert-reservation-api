@@ -13,4 +13,14 @@ public interface WaitingUseCase {
      *  SSE 연결 수립 (대기열 진입 시 클라이언트에서 호출)
      */
     SseEmitter subscribeToQueue(Long userId, Long resourceId, String userKey);
+
+    /**
+     * 활성화된 리소스별 대기자 순번 갱신 이벤트 처리
+     */
+    void publishActiveWaitingScheduleStatus();
+
+    /**
+     * 리소스ID에 대기 중인 대기자들 순번 알림 전송
+     */
+    void notifyWaitingQueueStatus(Long resourceId);
 }
