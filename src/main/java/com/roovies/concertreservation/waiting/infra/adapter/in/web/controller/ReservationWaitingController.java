@@ -47,4 +47,20 @@ public class ReservationWaitingController {
                         .build()
         );
     }
+
+    /**
+     * 2. SSE 연결 수립 (대기열 진입 시 클라이언트에서 호출되어야 함)
+     */
+    @GetMapping(value = "/subscribe", produces = MediaType.TEXT_EVENT_STREAM_VALUE)
+    public ResponseEntity<SseEmitter> subscribe(
+            @AuthenticationPrincipal UserDetails userDetails, // TODO: Custom UserDetails 구현 필요
+            @RequestParam String userkey,
+            @RequestParam Long scheduleId
+    ) {
+        // TODO: Security Context에서 가져오도록 해야함
+        Long tmpUserId = 1L;
+
+        SseEmitter emitter = waitingUseCase.subscribeToQueue(tmpUserId, scheduleId, userkey);
+        return ResponseEntity.ok().body(emitter);
+    }
 }

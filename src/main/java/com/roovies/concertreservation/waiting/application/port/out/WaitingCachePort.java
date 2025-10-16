@@ -8,4 +8,5 @@ public interface WaitingCachePort {
     void saveAdmittedToken(Long resourceId, String userKey, String admittedToken);
     void enterQueue(Long resourceId, String userKey);
     WaitingQueueStatus getRankAndTotalWaitingCount(Long resourceId, String userKey);
+    boolean removeWaitingQueue(Long resourceId, String userKey);
 }

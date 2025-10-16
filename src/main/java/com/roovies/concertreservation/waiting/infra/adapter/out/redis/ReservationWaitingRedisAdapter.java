@@ -67,6 +67,29 @@ public class ReservationWaitingRedisAdapter implements WaitingCachePort {
         return new WaitingQueueStatus(userKey, rank, totalWaiting);
     }
 
+    @Override
+    public boolean removeWaitingQueue(Long scheduleId, String userKey) {
+        String key = WAITING_PREFIX + scheduleId;
+        RScoredSortedSet<String> waitingQueue = redisson.getScoredSortedSet(key);
+        boolean result = waitingQueue.remove(userKey);
+        if (result) {
+            log.debug("대기열 큐에서 제거됨: scheduleId = {}, userKey = {}", scheduleId, userKey);
+
+            // 제거한 후 더이상 대기자가 없을 경우 활성화된 대기열 큐 목록에서 해당 스케줄 삭제
+            int remainingSize = waitingQueue.size();
+            if (remainingSize == 0) {
+                RSet<String> activeWaitingQueueScheduleIds = redisson.getSet(ACTIVE_WAITING_PREFIX);
+                boolean removedActiveWaitingQueue = activeWaitingQueueScheduleIds.remove(scheduleId.toString());
+                if (removedActiveWaitingQueue)
+                    log.debug("대기자가 없어 대기열 큐에서 제거됨: scheduleId = {}", scheduleId);
+            } else {
+                log.debug("대기자가 아직 존재하여 대기열 큐 유지: scheduleId = {}", scheduleId);
+            }
+        }
+
+        return result;
+    }
+
     private void addActiveQueue(Long scheduleId) {
         RSet<String> activeWaitingQueueSchedules = redisson.getSet(ACTIVE_WAITING_PREFIX);
         activeWaitingQueueSchedules.add(scheduleId.toString());
