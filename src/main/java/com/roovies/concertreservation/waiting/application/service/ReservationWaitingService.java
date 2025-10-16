@@ -46,6 +46,7 @@ public class ReservationWaitingService implements WaitingUseCase {
                     .admitted(false)
                     .rank(rank != null ? rank + 1 : null)  // ZRANK는 0부터 시작하므로 +1
                     .totalWaiting(totalWaiting)
+                    .userKey(status.userKey())
                     .build();
         }
     }

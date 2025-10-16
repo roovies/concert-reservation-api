@@ -64,7 +64,7 @@ public class ReservationWaitingRedisAdapter implements WaitingCachePort {
         Integer rank = waitingQueue.rank(userKey);
         Integer totalWaiting = waitingQueue.size();
 
-        return new WaitingQueueStatus(rank, totalWaiting);
+        return new WaitingQueueStatus(userKey, rank, totalWaiting);
     }
 
     private void addActiveQueue(Long scheduleId) {
