@@ -6,5 +6,5 @@ public interface WaitingUseCase {
     /**
      * 대기열 진입 또는 즉시 입장
      */
-    EnterQueueResult enterQueue(Long userId, Long resourceId);
+    EnterQueueResult enterOrWaitQueue(Long userId, Long resourceId);
 }

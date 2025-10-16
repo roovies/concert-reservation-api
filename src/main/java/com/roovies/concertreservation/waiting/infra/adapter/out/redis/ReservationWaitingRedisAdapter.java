@@ -1,11 +1,10 @@
 package com.roovies.concertreservation.waiting.infra.adapter.out.redis;
 
 import com.roovies.concertreservation.waiting.application.port.out.WaitingCachePort;
+import com.roovies.concertreservation.waiting.domain.vo.WaitingQueueStatus;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.redisson.api.RBucket;
-import org.redisson.api.RSemaphore;
-import org.redisson.api.RedissonClient;
+import org.redisson.api.*;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.stereotype.Repository;
 
@@ -39,9 +38,37 @@ public class ReservationWaitingRedisAdapter implements WaitingCachePort {
     }
 
     @Override
-    public void saveToken(Long scheduleId, String userKey, String admittedToken) {
+    public void saveAdmittedToken(Long scheduleId, String userKey, String admittedToken) {
         String key = ADMITTED_TOKEN_PREFIX + scheduleId + ":" + userKey;
         RBucket<String> bucket = redisson.getBucket(key);
         bucket.set(admittedToken, Duration.ofMinutes(10));
+
+        log.debug("[ReservationWaitingRedisAdapter] 입장 토큰 발급 완료 - scheduleId: {}, userKey: {}", scheduleId, userKey);
+    }
+
+    @Override
+    public void enterQueue(Long scheduleId, String userKey) {
+        String key = WAITING_PREFIX + scheduleId;
+        RScoredSortedSet<String> waitingQueue = redisson.getScoredSortedSet(key);
+        long timestamp = System.currentTimeMillis();
+        waitingQueue.add(timestamp, userKey);
+
+        addActiveQueue(scheduleId);
+    }
+
+    @Override
+    public WaitingQueueStatus getRankAndTotalWaitingCount(Long scheduleId, String userKey) {
+        String key = WAITING_PREFIX + scheduleId;
+        RScoredSortedSet<String> waitingQueue = redisson.getScoredSortedSet(key);
+
+        Integer rank = waitingQueue.rank(userKey);
+        Integer totalWaiting = waitingQueue.size();
+
+        return new WaitingQueueStatus(rank, totalWaiting);
+    }
+
+    private void addActiveQueue(Long scheduleId) {
+        RSet<String> activeWaitingQueueSchedules = redisson.getSet(ACTIVE_WAITING_PREFIX);
+        activeWaitingQueueSchedules.add(scheduleId.toString());
     }
 }
