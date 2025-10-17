@@ -20,6 +20,7 @@ public interface WaitingCachePort {
     WaitingQueueStatus getRankAndTotalWaitingCount(Long resourceId, String userKey);
     boolean removeWaitingQueue(Long resourceId, String userKey);
     Set<String> getActiveWaitingScheduleIds();
+    boolean hasActiveWaitingQueue(Long resourceId);
     Collection<String> getActiveWaitingUserKeys(Long resourceId);
     void removeActiveWaitingScheduleId(Long resourceId);
     int getWaitingQueueSize(Long resourceId);

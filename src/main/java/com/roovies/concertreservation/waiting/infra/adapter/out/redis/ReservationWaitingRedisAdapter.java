@@ -152,6 +152,12 @@ public class ReservationWaitingRedisAdapter implements WaitingCachePort {
     }
 
     @Override
+    public boolean hasActiveWaitingQueue(Long resourceId) {
+        RSet<String> activeWaitingScheduleIds = redisson.getSet(ACTIVE_WAITING_PREFIX);
+        return activeWaitingScheduleIds.contains(resourceId.toString());
+    }
+
+    @Override
     public Collection<String> getActiveWaitingUserKeys(Long scheduleId) {
         String key = WAITING_PREFIX + scheduleId;
         RScoredSortedSet<String> waitingQueue = redisson.getScoredSortedSet(key);

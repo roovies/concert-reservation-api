@@ -43,35 +43,30 @@ public class ReservationWaitingService implements WaitingUseCase {
 
     @Override
     public EnterQueueResult enterOrWaitQueue(Long userId, Long scheduleId) {
-        /**
-         * TODO: 세마포어 획득 전, 스케줄에 대기열이 활성화 되어 있는지 확인해야 함
-         * 왜??
-         * - 대기열이 존재해서 스케줄러에 의해 입장처리하고 있는데,
-         * - 입장처리에 의해 Permit이 생기는 시점에 새로운 입장요청이 들어오면 Permit이 있으니 대기열이 있음에도 먼저 진입할 수 있음
-         * - 활성화된 경우 else문을 바로 타도록해야함
-         */
+        // 대기열이 활성화된 스케줄인지 확인
+        boolean isActivate = waitingCachePort.hasActiveWaitingQueue(scheduleId);
 
-        // 세마포어 획득 시도
-        boolean acquired = waitingCachePort.tryAcquirePermit(scheduleId);
-        if (acquired) {
+        // 대기열이 비활성화 상태일 때만 세마포어 획득 시도
+        if (!isActivate && waitingCachePort.tryAcquirePermit(scheduleId)) {
             // 세마포어 획득 시 즉시 입장 - 입장 토큰 발급
             String admittedToken = issueAdmittedToken(userId, scheduleId);
             return EnterQueueResult.builder()
                     .admitted(true)
                     .admittedToken(admittedToken)
                     .build();
-        } else {
-            WaitingQueueStatus status = enterQueue(userId, scheduleId);
-            Integer rank = status.rank();
-            Integer totalWaiting = status.totalWaiting();
-
-            return EnterQueueResult.builder()
-                    .admitted(false)
-                    .rank(rank != null ? rank + 1 : null)  // ZRANK는 0부터 시작하므로 +1
-                    .totalWaiting(totalWaiting)
-                    .userKey(status.userKey())
-                    .build();
         }
+
+        // 대기열 입장 (대기열 활성화 상태이거나 세마포어 획득 실패 시)
+        WaitingQueueStatus status = enterQueue(userId, scheduleId);
+        Integer rank = status.rank();
+        Integer totalWaiting = status.totalWaiting();
+
+        return EnterQueueResult.builder()
+                .admitted(false)
+                .rank(rank != null ? rank + 1 : null)  // ZRANK는 0부터 시작하므로 +1
+                .totalWaiting(totalWaiting)
+                .userKey(status.userKey())
+                .build();
     }
 
     @Override
