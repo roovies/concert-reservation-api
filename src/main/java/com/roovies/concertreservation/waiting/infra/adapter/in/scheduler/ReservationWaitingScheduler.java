@@ -22,9 +22,21 @@ public class ReservationWaitingScheduler {
      */
     @Scheduled(fixedDelay = 5000)
     @SchedulerLock(name = "notifyQueueStatus", lockAtMostFor = "4s", lockAtLeastFor = "2s")
-    public void sendNotificationWaitingStatus() {
+    public void executeWaitingStatusNotification() {
         log.debug("=== 대기열이 활성화된 스케줄별 대기자 순번 업데이트 수행 ===");
         waitingUseCase.publishActiveWaitingScheduleStatus();
         log.debug("=== 대기열이 활성화된 스케줄별 대기자 순번 업데이트 완료 ===");
+    }
+
+    /**
+     * 스케줄러2: 3초마다 대기자 입장 처리
+     * - 모든 인스턴스에서 수행되도록 하되, 분산락을 통해 scheduleId 별로 thread-safe하게 처리되도록 함
+     * - 분산락을 적용했으므로 parallelStream을 활용하여 인스턴스 내에서도 병렬 쓰레드로 처리하도록 수행
+     */
+    @Scheduled(fixedDelay = 3000)
+    public void executeActiveWaitingAdmission() {
+        log.debug("=== 대기열이 활성화된 스케줄별 대기자 입장 처리 수행 ===");
+        waitingUseCase.admitUsersInActiveWaitingSchedules();
+        log.debug("=== 대기열이 활성화된 스케줄별 대기자 입장 처리 완료 ===");
     }
 }

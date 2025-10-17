@@ -1,16 +1,20 @@
 package com.roovies.concertreservation.waiting.infra.adapter.out.redis;
 
 import com.roovies.concertreservation.waiting.application.port.out.WaitingCachePort;
+import com.roovies.concertreservation.waiting.domain.vo.WaitingQueueEntry;
 import com.roovies.concertreservation.waiting.domain.vo.WaitingQueueStatus;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.redisson.api.*;
+import org.redisson.client.protocol.ScoredEntry;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.stereotype.Repository;
 
 import java.time.Duration;
 import java.util.Collection;
+import java.util.List;
 import java.util.Set;
+import java.util.concurrent.TimeUnit;
 
 @Slf4j
 @Repository
@@ -24,19 +28,68 @@ public class ReservationWaitingRedisAdapter implements WaitingCachePort {
     private static final String ADMITTED_TOKEN_PREFIX = "admitted:reservation:";        // admitted:reservation:{scheduleId}:{userId}:{uuid}
     private static final String ADMIT_LOCK_PREFIX = "admit:lock:reservation:";
 
+    private static final int MAX_PERMITS = 100;
+
     private final RedissonClient redisson;
 
     @Override
-    public boolean tryAcquireSemaphore(Long scheduleId, int maxPermits) {
+    public boolean tryAcquirePermit(Long scheduleId) {
         String key = SEMAPHORE_PREFIX + scheduleId;
         RSemaphore semaphore = redisson.getSemaphore(key);
 
         // Semaphore 초기화 (최초 1회)
         if (!semaphore.isExists())
-            semaphore.trySetPermits(maxPermits);
+            semaphore.trySetPermits(MAX_PERMITS);
 
         // Permit 획득 시도
         return semaphore.tryAcquire();
+    }
+
+    @Override
+    public boolean tryAcquirePermits(Long scheduleId, int count) {
+        String key = SEMAPHORE_PREFIX + scheduleId;
+        RSemaphore semaphore = redisson.getSemaphore(key);
+        return semaphore.tryAcquire(count);
+    }
+
+    @Override
+    public int getAvailablePermits(Long scheduleId) {
+        String key = SEMAPHORE_PREFIX + scheduleId;
+        RSemaphore semaphore = redisson.getSemaphore(key);
+        return semaphore.availablePermits();
+    }
+
+    @Override
+    public void releasePermits(Long scheduleId, int count) {
+        String key = SEMAPHORE_PREFIX + scheduleId;
+        RSemaphore semaphore = redisson.getSemaphore(key);
+        semaphore.release(count);
+    }
+
+    @Override
+    public boolean tryAcquireAdmitLock(Long scheduleId) {
+        String key = ADMIT_LOCK_PREFIX + scheduleId;
+        RLock lock = redisson.getLock(key);
+
+        try {
+            return lock.tryLock(0, 10,  TimeUnit.SECONDS);
+        } catch (InterruptedException e) {
+            Thread.currentThread().interrupt();
+            log.error("락 획득 중 인터럽트 발생: scheduleId = {}", scheduleId, e);
+            return false;
+        }
+    }
+
+    @Override
+    public void releaseAdmitLock(Long scheduleId) {
+        String key = ADMIT_LOCK_PREFIX + scheduleId;
+        RLock lock = redisson.getLock(key);
+
+        // 현재 스레드가 락을 보유하고 있을 때만 해제
+        if (lock.isHeldByCurrentThread()) {
+            lock.unlock();
+            log.debug("분산락 해제: scheduleId = {}", scheduleId);
+        }
     }
 
     @Override
@@ -109,6 +162,34 @@ public class ReservationWaitingRedisAdapter implements WaitingCachePort {
     public void removeActiveWaitingScheduleId(Long scheduleId) {
         RSet<String> activeWaitingScheduleIds = redisson.getSet(ACTIVE_WAITING_PREFIX);
         activeWaitingScheduleIds.remove(scheduleId);
+    }
+
+    @Override
+    public int getWaitingQueueSize(Long scheduleId) {
+        String key = WAITING_PREFIX + scheduleId;
+        RScoredSortedSet<String> waitingQueue = redisson.getScoredSortedSet(key);
+        return waitingQueue.size();
+    }
+
+    @Override
+    public List<WaitingQueueEntry> admitUsers(Long scheduleId, int count) {
+        String key = WAITING_PREFIX + scheduleId;
+        RScoredSortedSet<String> waitingQueue = redisson.getScoredSortedSet(key);
+
+        Collection<ScoredEntry<String>> entries = waitingQueue.pollFirstEntries(count);
+        return entries.stream()
+                .map(entry -> new WaitingQueueEntry(
+                        entry.getValue(),
+                        entry.getScore()
+                ))
+                .toList();
+    }
+
+    @Override
+    public void addUserToWaitingQueue(Long scheduleId, String userKey, double score) {
+        String key = WAITING_PREFIX + scheduleId;
+        RScoredSortedSet<String> waitingQueue = redisson.getScoredSortedSet(key);
+        waitingQueue.add(score, userKey);
     }
 
     private void addActiveQueue(Long scheduleId) {

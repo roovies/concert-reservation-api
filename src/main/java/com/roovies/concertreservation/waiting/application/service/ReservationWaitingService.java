@@ -6,6 +6,7 @@ import com.roovies.concertreservation.waiting.application.port.in.WaitingUseCase
 import com.roovies.concertreservation.waiting.application.port.out.EmitterRepositoryPort;
 import com.roovies.concertreservation.waiting.application.port.out.WaitingCachePort;
 import com.roovies.concertreservation.waiting.application.port.out.WaitingEventPublisher;
+import com.roovies.concertreservation.waiting.domain.vo.WaitingQueueEntry;
 import com.roovies.concertreservation.waiting.domain.vo.WaitingQueueStatus;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -26,7 +27,6 @@ import java.util.*;
 @RequiredArgsConstructor
 public class ReservationWaitingService implements WaitingUseCase {
 
-    private static final int MAX_PERMITS = 100;
     private static final long SSE_TIMOUT = 600000L; // 10분
 
     private final JwtUtils jwtUtils;
@@ -43,8 +43,16 @@ public class ReservationWaitingService implements WaitingUseCase {
 
     @Override
     public EnterQueueResult enterOrWaitQueue(Long userId, Long scheduleId) {
+        /**
+         * TODO: 세마포어 획득 전, 스케줄에 대기열이 활성화 되어 있는지 확인해야 함
+         * 왜??
+         * - 대기열이 존재해서 스케줄러에 의해 입장처리하고 있는데,
+         * - 입장처리에 의해 Permit이 생기는 시점에 새로운 입장요청이 들어오면 Permit이 있으니 대기열이 있음에도 먼저 진입할 수 있음
+         * - 활성화된 경우 else문을 바로 타도록해야함
+         */
+
         // 세마포어 획득 시도
-        boolean acquired = waitingCachePort.tryAcquireSemaphore(scheduleId, MAX_PERMITS);
+        boolean acquired = waitingCachePort.tryAcquirePermit(scheduleId);
         if (acquired) {
             // 세마포어 획득 시 즉시 입장 - 입장 토큰 발급
             String admittedToken = issueAdmittedToken(userId, scheduleId);
@@ -185,6 +193,155 @@ public class ReservationWaitingService implements WaitingUseCase {
                 log.error("순번 알림 처리 중 오류 발생: userKey = {}", userKey, e);
             }
         }
+    }
+
+    @Override
+    public void notifyAdmittedUsers(Map<String, String> userKeyToAdmittedToken) {
+        for (Map.Entry<String, String> entry : userKeyToAdmittedToken.entrySet()) {
+            String userKey = entry.getKey();
+            String admitToken = entry.getValue();
+
+            SseEmitter emitter = emitterRepositoryPort.getEmitterByUserKey(userKey);
+            if (emitter != null) {
+                try {
+                    emitter.send(SseEmitter.event()
+                            .name("admit")
+                            .data(admitToken));
+
+                    log.info("입장처리 SSE 알림 전송 완료: userKey = {}", userKey);
+                    emitterRepositoryPort.removeEmitterByUserKey(userKey);
+                } catch (Exception e) {
+                    log.error("입장처리 SSE 알림 전송 실패: userKey = {}", userKey, e);
+                    // 재시도 로직 구현 커스터마이징 필요
+                    // 우선 현재 로직은 재시도 로직 없이 바로 Local Emitter Map에서 삭제하도록 함
+                    emitterRepositoryPort.removeEmitterByUserKey(userKey);
+                }
+            }
+        }
+    }
+
+    @Override
+    public void admitUsersInActiveWaitingSchedules() {
+        Set<String> scheduleIds = waitingCachePort.getActiveWaitingScheduleIds();
+        if (scheduleIds.isEmpty()) {
+            log.debug("대기열이 발생한 스케줄이 존재하지 않음");
+            return;
+        }
+
+        // 분산락으로 다중 인스턴스 및 멀티스레드(병렬처리)에서 동시성 제어
+        scheduleIds.parallelStream().forEach(scheduleIdStr -> {
+            Long scheduleId = Long.parseLong(scheduleIdStr);
+            boolean admitLockAcquired = waitingCachePort.tryAcquireAdmitLock(scheduleId);
+            if (admitLockAcquired) {
+                Map<String, String> localUserToAdmittedToken = new HashMap<>();
+                Map<String, String> remoteUserToAdmittedToken = new HashMap<>();
+
+                try {
+                    // 가용 가능한 Permit 수 확인
+                    final int availablePermits = waitingCachePort.getAvailablePermits(scheduleId);
+                    if (availablePermits <= 0) {
+                        log.debug("해당 스케줄에 사용 가능한 Permit이 없음: scheduleId = {}", scheduleId);
+                        return;
+                    }
+
+                    // 해당 스케줄 대기자 수 조회
+                    final int waitingQueueSize = waitingCachePort.getWaitingQueueSize(scheduleId);
+                    if (waitingQueueSize <= 0) {
+                        log.debug("해당 스케줄에 대기자가 없음: scheduleId = {}", scheduleId);
+
+                        // 대기자가 존재하지 않으니 활성 대기열 목록에서 해당 스케줄ID를 제거
+                        waitingCachePort.removeActiveWaitingScheduleId(scheduleId);
+                        log.debug("스케줄에 실제 대기자가 없어 활성 대기열 목록에서 제거됨: scheduleId = {}", scheduleId);
+                        return;
+                    }
+
+                    // 입장 처리할 대기자 수 결정
+                    final int countToAdmit = Math.min(availablePermits, waitingQueueSize);
+
+                    // 결정된 수만큼 Permit 획득 (Atomic)
+                    boolean permitLockAcquired = waitingCachePort.tryAcquirePermits(scheduleId, countToAdmit);
+                    if (!permitLockAcquired) {
+                        log.debug("해당 스케줄 Permit 획득 실패({}개): scheduleId = {}", countToAdmit, scheduleId);
+                        return;
+                    }
+
+                    log.debug("해당 스케줄 Permit 획득 성공({}개): scheduleId = {}", countToAdmit, scheduleId);
+
+                    // 대기열에서 획득한 Permit 수만큼 사용자 추출(ZPOPMIN)
+                    // 입장 허용 처리 실패 시 다시 대기열에 넣어줘야 하므로 기존 score 정보도 함께 조회
+                    List<WaitingQueueEntry> admittedEntries = waitingCachePort.admitUsers(scheduleId, countToAdmit);
+
+                    // 보상 트랜잭션: 추출된 사용자 < 획득한 Permit 수 => 잔여 Permit 반환
+                    int admittedSize = admittedEntries.size();
+                    if (admittedSize < countToAdmit) {
+                        int countToRelease = countToAdmit - admittedSize;
+                        waitingCachePort.releasePermits(scheduleId, countToRelease);
+                        log.debug("추출된 대기자가 획득한 Permit 수보다 적어 잔여 Permit 반납: scheduleId = {}, permitsToReturn = {}", scheduleId, countToRelease);
+                    }
+
+                    if (admittedSize == 0) {
+                        // admittedSize < countToAdmit 뒤에 넣은 이유는 잔여 Permit 수만큼 락 해제를 먼저 수행하기 위해서다.
+                        log.debug("실제 입장 처리된 대기자가 없음: scheduleId = {}, admittedSize = {}", scheduleId, admittedSize);
+                    }
+
+                    // 입장 토큰 발급
+                    int failCount = 0;
+                    for (WaitingQueueEntry entry : admittedEntries) {
+                        String userKey = entry.userKey();
+                        double originalScore = entry.score();
+
+                        String[] parts = userKey.split(":");
+
+                        try {
+                            // Claims 구성
+                            Map<String, String> claims = new HashMap<>();
+                            claims.put("userKey", userKey);
+                            claims.put("scheduleId", scheduleIdStr);
+                            claims.put("type", "ADMITTED");
+
+                            String userIdStr = parts[0];
+                            String admittedToken = jwtUtils.generateToken(userIdStr, claims, Duration.ofMinutes(10).toMillis());
+
+                            // Redis에 입장 토큰 저장 (TTL: 10분)
+                            waitingCachePort.saveAdmittedToken(scheduleId, userKey, admittedToken);
+
+
+                            // 로컬 EmitterMap에 존재하는지 확인 (분산락 내부에서 확인만)
+                            if (emitterRepositoryPort.containsEmitterByUserKey(userKey))
+                                localUserToAdmittedToken.put(userKey, admittedToken);
+                            else
+                                remoteUserToAdmittedToken.put(userKey, admittedToken);
+
+                            log.debug("입장 토큰 발급 완료: userKey = {}", userKey);
+                        } catch (Exception e) {
+                            log.error("입장 토큰 발급 실패: userKey = {}", userKey, e);
+
+                            // 입장 토큰 발급 실패되면 Permit 반납을 위해 실패 횟수 카운팅
+                            failCount++;
+
+                            // 보상 트랜잭션: 입장 토큰 발급 실패 시 해당 사용자를 다시 대기열 맨 앞에 추가
+                            waitingCachePort.addUserToWaitingQueue(scheduleId, userKey, originalScore);
+                            log.info("입장 토큰 발급 실패로 대기열에 재추가: userKey = {}, originalScore = {}", userKey, originalScore);
+                        }
+                    }
+
+                    // 보상 트랜잭션: 토큰 발급 실패 건수만큼 Permit 반납
+                    if (failCount > 0) {
+                        waitingCachePort.releasePermits(scheduleId, failCount);
+                        log.info("입장 토큰 발급 실패로 Permit 반납: scheduleId = {}, failCount = {}", scheduleId, failCount);
+                    }
+                } finally {
+                    // 분산락 해제
+                    waitingCachePort.releaseAdmitLock(scheduleId);
+                }
+
+                if (!localUserToAdmittedToken.isEmpty())
+                    notifyAdmittedUsers(localUserToAdmittedToken);
+
+                if (!remoteUserToAdmittedToken.isEmpty())
+                    waitingEventPublisher.notifyAdmittedUsersEvent(remoteUserToAdmittedToken);
+            }
+        });
     }
 
     /**
