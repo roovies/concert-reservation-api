@@ -45,10 +45,19 @@ dependencies {
     // DB
 	runtimeOnly("com.mysql:mysql-connector-j")
 
+	// JWT
+	implementation("io.jsonwebtoken:jjwt-api:0.11.5")
+	runtimeOnly("io.jsonwebtoken:jjwt-impl:0.11.5")
+	runtimeOnly("io.jsonwebtoken:jjwt-jackson:0.11.5") // JSON 파싱용 (jackson)
+
 	// Spring Data Redis
 	implementation("org.springframework.boot:spring-boot-starter-data-redis")
 	// Redisson
 	implementation("org.redisson:redisson-spring-boot-starter:3.51.0")
+
+	// ShedLock - 분산 환경에서 스케줄러 작업의 중복 실행 방지
+	implementation("net.javacrumbs.shedlock:shedlock-spring:5.10.2")
+	implementation("net.javacrumbs.shedlock:shedlock-provider-jdbc-template:5.10.2")
 
 	// OpenAPI
 	implementation("org.springdoc:springdoc-openapi-starter-webmvc-ui:2.1.0")
