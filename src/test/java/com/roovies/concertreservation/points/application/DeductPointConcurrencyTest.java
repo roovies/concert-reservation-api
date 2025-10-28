@@ -6,6 +6,7 @@ import com.roovies.concertreservation.points.application.port.out.PointCommandRe
 import com.roovies.concertreservation.points.application.service.DeductPointService;
 import com.roovies.concertreservation.points.domain.entity.Point;
 import com.roovies.concertreservation.shared.domain.vo.Amount;
+import com.roovies.concertreservation.testcontainers.MySQLTestContainer;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
@@ -23,7 +24,7 @@ import java.util.stream.IntStream;
 import static org.assertj.core.api.Assertions.assertThat;
 
 @SpringBootTest
-@Import(TestcontainersConfiguration.class)
+@Import(MySQLTestContainer.class)
 @DisplayName("포인트 차감 동시성 테스트")
 public class DeductPointConcurrencyTest {
 
