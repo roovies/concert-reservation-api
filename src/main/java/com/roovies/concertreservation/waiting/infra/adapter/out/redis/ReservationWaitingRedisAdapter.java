@@ -17,8 +17,7 @@ import java.util.Set;
 import java.util.concurrent.TimeUnit;
 
 @Slf4j
-@Repository
-@Qualifier("reservationWaitingRedis")
+@Repository("reservationWaitingRedis")
 @RequiredArgsConstructor
 public class ReservationWaitingRedisAdapter implements WaitingCachePort {
 

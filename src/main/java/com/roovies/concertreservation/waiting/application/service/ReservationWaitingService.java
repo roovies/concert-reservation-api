@@ -21,8 +21,7 @@ import java.time.LocalDateTime;
 import java.util.*;
 
 @Slf4j
-@Service
-@Qualifier("reservationWaitingService")
+@Service("reservationWaitingService")
 @Transactional
 @RequiredArgsConstructor
 public class ReservationWaitingService implements WaitingUseCase {
