@@ -14,9 +14,8 @@ import org.springframework.stereotype.Component;
 import java.util.Map;
 
 @Slf4j
-@Component
+@Component("reservationRedisEventPublisher")
 @RequiredArgsConstructor
-@Qualifier("reservationRedisEventPublisher")
 public class ReservationRedisEventPublisher implements WaitingEventPublisher {
 
     private static final String CHANNEL_STATUS = "channel:status";

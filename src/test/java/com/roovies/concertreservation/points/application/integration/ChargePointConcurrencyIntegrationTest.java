@@ -1,16 +1,16 @@
-package com.roovies.concertreservation.points.application;
+package com.roovies.concertreservation.points.application.integration;
 
 import com.roovies.concertreservation.points.application.dto.command.ChargePointCommand;
 import com.roovies.concertreservation.points.application.port.out.PointCommandRepositoryPort;
 import com.roovies.concertreservation.points.application.service.ChargePointService;
 import com.roovies.concertreservation.points.domain.entity.Point;
 import com.roovies.concertreservation.shared.domain.vo.Amount;
+import com.roovies.concertreservation.testcontainers.MySQLTestContainer;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.context.annotation.Import;
-import org.testcontainers.utility.TestcontainersConfiguration;
 
 import java.time.LocalDateTime;
 import java.util.List;
@@ -21,8 +21,8 @@ import java.util.stream.IntStream;
 import static org.assertj.core.api.Assertions.*;
 
 @SpringBootTest
-@Import(TestcontainersConfiguration.class) // Testcontainers 설정 포함
-public class ChargePointConcurrencyTest {
+@Import(MySQLTestContainer.class) // Testcontainers 설정 포함
+public class ChargePointConcurrencyIntegrationTest {
 
     @Autowired
     private ChargePointService chargePointService;

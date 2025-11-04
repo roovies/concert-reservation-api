@@ -1,4 +1,4 @@
-package com.roovies.concertreservation;
+package com.roovies.concertreservation.testcontainers;
 
 import jakarta.annotation.PreDestroy;
 import org.springframework.context.annotation.Configuration;

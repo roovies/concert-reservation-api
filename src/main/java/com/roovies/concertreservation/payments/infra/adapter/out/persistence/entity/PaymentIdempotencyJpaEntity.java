@@ -19,8 +19,8 @@ import java.time.LocalDateTime;
         })
 public class PaymentIdempotencyJpaEntity {
     @Id
-    @Column(name ="key", length = 255)
-    private String key;
+    @Column(name = "idempotency_key", length = 255)
+    private String idempotencyKey;
 
     @Column(name = "user_id", nullable = false)
     private Long userId;
@@ -56,10 +56,10 @@ public class PaymentIdempotencyJpaEntity {
         );
     }
 
-    private PaymentIdempotencyJpaEntity(String key, Long userId, Long paymentId,
+    private PaymentIdempotencyJpaEntity(String idempotencyKey, Long userId, Long paymentId,
                                         PaymentIdempotencyStatus status, String resultData,
                                         LocalDateTime createdAt, LocalDateTime completedAt) {
-        this.key = key;
+        this.idempotencyKey = idempotencyKey;
         this.userId = userId;
         this.paymentId = paymentId;
         this.status = status;

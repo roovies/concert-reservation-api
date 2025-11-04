@@ -21,8 +21,8 @@ public class VenueSeatJpaEntity {
     @JoinColumn(name = "venue_id", nullable = false)
     private VenueJpaEntity venue;
 
-    @Column(nullable = false)
-    private int row;
+    @Column(name = "seat_row", nullable = false)
+    private int seatRow;
 
     @Column(name = "seat_number", nullable = false)
     private int seatNumber;

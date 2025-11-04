@@ -39,7 +39,7 @@ public class PaymentIdempotencyRepositoryAdapter implements PaymentIdempotencyRe
             PaymentIdempotencyJpaEntity idempotencyJpaEntity = entity.get();
             return Optional.of(
                     PaymentIdempotency.create(
-                            idempotencyJpaEntity.getKey(),
+                            idempotencyJpaEntity.getIdempotencyKey(),
                             idempotencyJpaEntity.getUserId(),
                             idempotencyJpaEntity.getPaymentId(),
                             idempotencyJpaEntity.getStatus(),

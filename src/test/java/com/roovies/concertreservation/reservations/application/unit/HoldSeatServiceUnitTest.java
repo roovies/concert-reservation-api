@@ -1,4 +1,4 @@
-package com.roovies.concertreservation.reservations.application;
+package com.roovies.concertreservation.reservations.application.unit;
 
 import com.roovies.concertreservation.reservations.application.dto.command.HoldSeatCommand;
 import com.roovies.concertreservation.reservations.application.dto.result.HoldSeatResult;
@@ -23,8 +23,7 @@ import static org.assertj.core.api.Assertions.*;
 import static org.mockito.BDDMockito.*;
 
 @ExtendWith(MockitoExtension.class)
-public class
-HoldSeatUseCaseTest {
+public class HoldSeatServiceUnitTest {
 
     @Mock
     private HoldSeatCachePort holdSeatCachePort;
