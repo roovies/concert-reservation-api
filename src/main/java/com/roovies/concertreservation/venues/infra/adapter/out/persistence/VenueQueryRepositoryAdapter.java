@@ -45,7 +45,7 @@ public class VenueQueryRepositoryAdapter implements VenueQueryRepositoryPort {
             List<VenueSeat> seats = venue.getSeats().stream()
                     .map(seatEntity -> VenueSeat.create(
                             seatEntity.getId(),
-                            seatEntity.getRow(),
+                            seatEntity.getSeatRow(),
                             seatEntity.getSeatNumber(),
                             seatEntity.getType(),
                             new Money(seatEntity.getPrice()),
