@@ -1,4 +1,4 @@
-package com.roovies.concertreservation.reservations.application;
+package com.roovies.concertreservation.reservations.application.unit;
 
 import com.roovies.concertreservation.concerts.domain.enums.ScheduleStatus;
 import com.roovies.concertreservation.venues.domain.enums.SeatType;
@@ -29,7 +29,7 @@ import static org.assertj.core.api.Assertions.*;
 import static org.mockito.BDDMockito.*;
 
 @ExtendWith(MockitoExtension.class)
-public class GetAvailableSeatListUseCaseTest {
+public class GetAvailableSeatListServiceUnitTest {
 
     @Mock
     private ReservationRepositoryPort reservationRepositoryPort;

@@ -1,4 +1,4 @@
-package com.roovies.concertreservation.waiting.integration;
+package com.roovies.concertreservation.waiting.application.integration;
 
 import com.roovies.concertreservation.testcontainers.RedisTestContainer;
 import com.roovies.concertreservation.waiting.application.dto.result.EnterQueueResult;

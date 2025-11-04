@@ -1,4 +1,4 @@
-package com.roovies.concertreservation.waiting.unit.service;
+package com.roovies.concertreservation.waiting.application.unit;
 
 import com.roovies.concertreservation.shared.util.security.JwtUtils;
 import com.roovies.concertreservation.waiting.application.dto.result.EnterQueueResult;
@@ -26,7 +26,7 @@ import static org.mockito.BDDMockito.*;
 
 @ExtendWith(MockitoExtension.class)
 @DisplayName("ReservationWaitingService 단위 테스트")
-public class ReservationWaitingServiceTest {
+public class ReservationWaitingServiceUnitTest {
 
     @Mock
     private JwtUtils jwtUtils;

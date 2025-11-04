@@ -1,4 +1,4 @@
-package com.roovies.concertreservation.points.application;
+package com.roovies.concertreservation.points.application.unit;
 
 import com.roovies.concertreservation.points.application.dto.command.ChargePointCommand;
 import com.roovies.concertreservation.points.application.dto.result.ChargePointResult;
@@ -21,7 +21,7 @@ import static org.assertj.core.api.Assertions.*;
 import static org.mockito.BDDMockito.*;
 
 @ExtendWith(MockitoExtension.class)
-public class ChargePointServiceTest {
+public class ChargePointServiceUnitTest {
 
     @Mock
     private PointCommandRepositoryPort pointCommandRepositoryPort;

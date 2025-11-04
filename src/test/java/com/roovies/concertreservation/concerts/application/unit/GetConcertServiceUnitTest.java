@@ -1,4 +1,4 @@
-package com.roovies.concertreservation.concerts.application;
+package com.roovies.concertreservation.concerts.application.unit;
 
 import com.roovies.concertreservation.concerts.application.dto.result.GetConcertResult;
 import com.roovies.concertreservation.concerts.application.port.out.ConcertVenueGatewayPort;
@@ -23,7 +23,7 @@ import static org.assertj.core.api.Assertions.*;
 import static org.mockito.BDDMockito.*;
 
 @ExtendWith(MockitoExtension.class)
-public class GetConcertUseCaseTest {
+public class GetConcertServiceUnitTest {
 
     @Mock
     private ConcertQueryRepositoryPort concertQueryRepositoryPort;

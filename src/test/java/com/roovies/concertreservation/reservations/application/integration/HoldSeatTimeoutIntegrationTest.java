@@ -1,4 +1,4 @@
-package com.roovies.concertreservation.reservations.application;
+package com.roovies.concertreservation.reservations.application.integration;
 
 import com.roovies.concertreservation.reservations.application.dto.command.HoldSeatCommand;
 import com.roovies.concertreservation.reservations.application.dto.result.HoldSeatResult;
@@ -18,7 +18,7 @@ import static org.assertj.core.api.Assertions.assertThat;
 
 @SpringBootTest
 @DisplayName("좌석 예약 타임아웃 테스트")
-public class HoldSeatTimeoutTest extends RedisTestContainer {
+public class HoldSeatTimeoutIntegrationTest extends RedisTestContainer {
 
     @Autowired
     private HoldSeatUseCase holdSeatUseCase;

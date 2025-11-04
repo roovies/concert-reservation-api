@@ -1,4 +1,4 @@
-package com.roovies.concertreservation.payments.application;
+package com.roovies.concertreservation.payments.application.integration;
 
 import com.roovies.concertreservation.payments.application.dto.command.PayReservationCommand;
 import com.roovies.concertreservation.payments.application.port.in.PayReservationUseCase;
@@ -20,7 +20,7 @@ import static org.assertj.core.api.Assertions.*;
 
 @SpringBootTest
 @DisplayName("예약 지연 결제 테스트")
-public class PaymentDelayTest extends RedisTestContainer {
+public class PaymentDelayIntegrationTest extends RedisTestContainer {
 
     @Autowired
     private HoldSeatUseCase holdSeatUseCase;
