@@ -10,7 +10,6 @@ import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.boot.test.context.SpringBootTest;
-import org.springframework.context.annotation.Import;
 
 import java.util.List;
 import java.util.stream.IntStream;
@@ -18,9 +17,8 @@ import java.util.stream.IntStream;
 import static org.assertj.core.api.Assertions.*;
 
 @SpringBootTest
-@Import(RedisTestContainer.class)
 @DisplayName("대기열 입장 처리 통합 테스트")
-public class WaitingAdmissionIntegrationTest {
+public class WaitingAdmissionIntegrationTest extends RedisTestContainer {
 
     @Autowired
     @Qualifier("reservationWaitingService")
