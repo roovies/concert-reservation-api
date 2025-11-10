@@ -5,6 +5,7 @@ import com.roovies.concertreservation.reservations.application.dto.result.HoldSe
 import com.roovies.concertreservation.reservations.application.port.in.HoldSeatUseCase;
 import com.roovies.concertreservation.reservations.application.port.out.HoldSeatCachePort;
 import com.roovies.concertreservation.reservations.application.port.out.HoldSeatIdempotencyCachePort;
+import com.roovies.concertreservation.shared.infra.lock.DistributedLock;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
@@ -29,6 +30,11 @@ public class HoldSeatService implements HoldSeatUseCase {
 
     /**
      * 좌석 홀딩 요청을 처리한다.
+     * <p>
+     * AOP 기반 분산락을 사용하여 좌석별 동시성을 제어합니다.
+     * - @DistributedLock이 먼저 획득되고, 그 다음 @Transactional이 시작됨
+     * - 좌석별 개별 락으로 병렬 처리 가능
+     * - 데드락 방지를 위해 락 키를 정렬하여 획득
      *
      * @param command 좌석 홀딩 요청 정보 (멱등성 키, 스케줄 ID, 좌석 ID 목록, 사용자 ID 포함)
      * @return {@link HoldSeatResult} 홀딩된 좌석 및 TTL 정보
@@ -36,6 +42,13 @@ public class HoldSeatService implements HoldSeatUseCase {
      * @throws IllegalStateException 다른 사용자가 이미 좌석을 예약 중인 경우
      */
     @Override
+    @DistributedLock(
+            keyPrefix = "'lock:seat:' + #command.scheduleId() + ':'",
+            keyList = "#command.seatIds()",
+            sorted = true,  // 데드락 방지
+            waitTime = 3000L,
+            leaseTime = 10000L
+    )
     public HoldSeatResult holdSeat(HoldSeatCommand command) {
         String idempotencyKey = command.idempotencyKey();
         Long scheduleId = command.scheduleId();
@@ -52,6 +65,12 @@ public class HoldSeatService implements HoldSeatUseCase {
             return existingResult;
 
         try {
+            // 좌석 목록 검증
+            if (seatIds == null || seatIds.isEmpty()) {
+                log.warn("홀딩할 좌석 목록이 비어있음: scheduleId={}, userId={}", scheduleId, userId);
+                throw new IllegalArgumentException("예약할 좌석이 없습니다.");
+            }
+
             // 좌석 ID 중복 제거
             List<Long> uniqueSeatIds = seatIds.stream()
                     .distinct()
