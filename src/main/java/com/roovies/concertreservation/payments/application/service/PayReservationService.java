@@ -40,6 +40,7 @@ public class PayReservationService implements PayReservationUseCase {
     private final PaymentReservationGatewayPort paymentReservationGatewayPort;
     private final PaymentPointGatewayPort paymentPointGatewayPort;
     private final PaymentUserGatewayPort paymentUserGatewayPort;
+    private final PaymentEventPort paymentEventPort;
 
     private final ObjectMapper objectMapper;
 
@@ -92,6 +93,9 @@ public class PayReservationService implements PayReservationUseCase {
 
             // 성공한 경우 멱등성 정보 갱신
             paymentIdempotencyRepositoryPort.setResult(idempotencyKey, result.getId(), objectMapper.writeValueAsString(payReservationResult));
+
+            // 결제 완료 이벤트 발행 (랭킹 계산용)
+            paymentEventPort.publishPaymentCompleted(result.getId(), scheduleId, userId);
 
             log.info("[PayReservationService] 홀딩된 좌석 결제 성공 - userId: {}, scheduleId: {}, seatIds: {}",
                     userId, scheduleId, seatIds);
