@@ -45,4 +45,19 @@ public class ConcertJpaEntity {
     public void setSchedules(List<ConcertScheduleJpaEntity> schedules) {
         this.schedules = schedules;
     }
+
+    /**
+     * 테스트용 팩토리 메서드
+     */
+    public static ConcertJpaEntity create(String title, String artist) {
+        ConcertJpaEntity concert = new ConcertJpaEntity();
+        concert.title = title;
+        concert.description = artist + " 콘서트";
+        concert.minPrice = 10000L;
+        concert.startDate = LocalDate.now();
+        concert.endDate = LocalDate.now().plusMonths(1);
+        concert.createdAt = LocalDateTime.now();
+        concert.updatedAt = LocalDateTime.now();
+        return concert;
+    }
 }
