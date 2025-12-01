@@ -47,4 +47,15 @@ public class ReservationDetailJpaEntity {
         this.scheduleId = scheduleId;
         this.seatId = seatId;
     }
+
+    /**
+     * 테스트용 팩토리 메서드
+     */
+    public static ReservationDetailJpaEntity create(ReservationJpaEntity reservation, Long scheduleId, Long seatId) {
+        return ReservationDetailJpaEntity.builder()
+                .reservation(reservation)
+                .scheduleId(scheduleId)
+                .seatId(seatId)
+                .build();
+    }
 }

@@ -43,4 +43,18 @@ public class ConcertScheduleJpaEntity {
 
     @Column(name = "created_at", nullable = false, updatable = false)
     private LocalDateTime createdAt;
+
+    /**
+     * 테스트용 팩토리 메서드
+     */
+    public static ConcertScheduleJpaEntity create(ConcertJpaEntity concert, LocalDate scheduleDate, int totalSeats) {
+        ConcertScheduleJpaEntity schedule = new ConcertScheduleJpaEntity();
+        schedule.concert = concert;
+        schedule.venueId = 1L; // 기본값
+        schedule.scheduleDate = scheduleDate;
+        schedule.availableSeats = totalSeats;
+        schedule.scheduleStatus = ScheduleStatus.AVAILABLE;
+        schedule.createdAt = LocalDateTime.now();
+        return schedule;
+    }
 }

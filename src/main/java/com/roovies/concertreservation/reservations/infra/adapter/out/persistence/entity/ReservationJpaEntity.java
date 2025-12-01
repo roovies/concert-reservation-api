@@ -61,4 +61,18 @@ public class ReservationJpaEntity {
         this.updatedAt = updatedAt;
         this.reservationDetails = reservationDetails;
     }
+
+    /**
+     * 테스트용 팩토리 메서드
+     */
+    public static ReservationJpaEntity create(Long paymentId, Long userId, ReservationStatus status, LocalDateTime createdAt) {
+        return ReservationJpaEntity.builder()
+                .paymentId(paymentId)
+                .userId(userId)
+                .status(status)
+                .createdAt(createdAt)
+                .updatedAt(createdAt)
+                .reservationDetails(new ArrayList<>())
+                .build();
+    }
 }
