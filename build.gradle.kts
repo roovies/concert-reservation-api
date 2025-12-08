@@ -42,6 +42,9 @@ dependencies {
 	// Spring Security
 	implementation("org.springframework.boot:spring-boot-starter-security")
 
+	// Spring Kafka
+	implementation("org.springframework.kafka:spring-kafka")
+
     // DB
 	runtimeOnly("com.mysql:mysql-connector-j")
 
