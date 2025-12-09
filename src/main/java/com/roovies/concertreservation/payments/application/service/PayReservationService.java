@@ -12,6 +12,7 @@ import com.roovies.concertreservation.payments.domain.entity.PaymentIdempotency;
 import com.roovies.concertreservation.payments.application.dto.query.GetHeldSeatListQuery;
 import com.roovies.concertreservation.payments.domain.external.ExternalHeldSeatList;
 import com.roovies.concertreservation.reservations.domain.enums.ReservationStatus;
+import com.roovies.concertreservation.shared.domain.event.ReservationCompletedKafkaEvent;
 import com.roovies.concertreservation.shared.domain.vo.Amount;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -41,6 +42,7 @@ public class PayReservationService implements PayReservationUseCase {
     private final PaymentPointGatewayPort paymentPointGatewayPort;
     private final PaymentUserGatewayPort paymentUserGatewayPort;
     private final PaymentEventPort paymentEventPort;
+    private final PaymentKafkaEventPort paymentKafkaEventPort;
 
     private final ObjectMapper objectMapper;
 
@@ -94,8 +96,22 @@ public class PayReservationService implements PayReservationUseCase {
             // 성공한 경우 멱등성 정보 갱신
             paymentIdempotencyRepositoryPort.setResult(idempotencyKey, result.getId(), objectMapper.writeValueAsString(payReservationResult));
 
-            // 결제 완료 이벤트 발행 (랭킹 계산용)
+            // 결제 완료 이벤트 발행 (랭킹 계산용 - Redis Pub/Sub)
             paymentEventPort.publishPaymentCompleted(result.getId(), scheduleId, userId);
+
+            // 예약 완료 이벤트 발행 (알림 등 다른 서비스용 - Kafka)
+            ReservationCompletedKafkaEvent kafkaEvent = ReservationCompletedKafkaEvent.of(
+                    payReservationResult.paymentId(),
+                    payReservationResult.scheduleId(),
+                    payReservationResult.seatIds(),
+                    payReservationResult.userId(),
+                    payReservationResult.originalAmount(),
+                    payReservationResult.discountAmount(),
+                    payReservationResult.paidAmount(),
+                    payReservationResult.status(),
+                    payReservationResult.completedAt()
+            );
+            paymentKafkaEventPort.publishReservationCompleted(kafkaEvent);
 
             log.info("[PayReservationService] 홀딩된 좌석 결제 성공 - userId: {}, scheduleId: {}, seatIds: {}",
                     userId, scheduleId, seatIds);

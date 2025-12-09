@@ -27,3 +27,50 @@ spring:
       hibernate.timezone.default_storage: NORMALIZE_UTC
       hibernate.jdbc.time_zone: UTC
     database-platform: org.hibernate.dialect.MySQL8Dialect
+
+  # Kafka 설정
+  kafka:
+    # ============================================================
+    # 연결 설정 - 환경별로 달라지는 값
+    # ============================================================
+    bootstrap-servers: ${KAFKA_BOOTSTRAP_SERVERS:localhost:10000,localhost:10001,localhost:10002}
+
+    # ============================================================
+    # Producer 튜닝 값
+    # ============================================================
+    producer:
+      batch-size: ${KAFKA_PRODUCER_BATCH_SIZE:16384}
+      properties:
+        linger.ms: ${KAFKA_PRODUCER_LINGER_MS:5}
+        buffer.memory: ${KAFKA_PRODUCER_BUFFER_MEMORY:33554432}
+        request.timeout.ms: 30000
+        delivery.timeout.ms: 120000
+
+    # ============================================================
+    # Consumer 튜닝 값
+    # ============================================================
+    consumer:
+      group-id: ${spring.application.name}-group
+      max-poll-records: ${KAFKA_CONSUMER_MAX_POLL_RECORDS:500}
+      properties:
+        max.poll.interval.ms: ${KAFKA_CONSUMER_MAX_POLL_INTERVAL:300000}
+        session.timeout.ms: 45000
+        heartbeat.interval.ms: 10000
+        fetch.min.bytes: 1
+        fetch.max.wait.ms: 500
+
+    # ============================================================
+    # Listener 스케일 설정
+    # ============================================================
+    listener:
+      concurrency: ${KAFKA_LISTENER_CONCURRENCY:3}
+
+# ============================================================
+# 애플리케이션 레벨 설정
+# ============================================================
+app:
+  kafka:
+    topics:
+      concert-reservation: ${KAFKA_TOPIC_RESERVATION:concert-reservation-events}
+      payment: ${KAFKA_TOPIC_PAYMENT:payment-events}
+      notification: ${KAFKA_TOPIC_NOTIFICATION:notification-events}
