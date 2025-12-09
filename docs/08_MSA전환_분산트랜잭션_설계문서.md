@@ -97,12 +97,12 @@ public PayReservationResult payReservation(PayReservationCommand command) {
                             │
         ┌───────────────────┼───────────────────┐
         │                   │                   │
-┌───────▼────────┐  ┌──────▼───────┐  ┌───────▼────────┐
-│ User Service   │  │Concert Service│  │Reservation Svc │
+┌───────▼────────┐  ┌────────▼───────┐  ┌───────▼────────┐
+│ User Service   │  │Concert Service │  │Reservation Svc │
 │                │  │                │  │                │
 │ - users        │  │ - concerts     │  │ - reservations │
 │                │  │ - venues       │  │ - waiting      │
-│ DB: PostgreSQL │  │ DB: PostgreSQL │  │ DB: PostgreSQL │
+│    DB: MySQL   │  │    DB: MySQL   │  │    DB: MySQL   │
 │                │  │                │  │ Cache: Redis   │
 └────────────────┘  └────────────────┘  └────────────────┘
         │                   │                   │
@@ -110,12 +110,12 @@ public PayReservationResult payReservation(PayReservationCommand command) {
                             │
         ┌───────────────────┼───────────────────┐
         │                   │                   │
-┌───────▼────────┐  ┌──────▼───────┐  ┌───────▼────────┐
-│ Payment Svc    │  │Notification   │  │Event Store     │
-│                │  │    Service    │  │   (Optional)   │
+┌───────▼────────┐  ┌────────▼───────┐  ┌───────▼────────┐
+│ Payment Svc    │  │Notification    │  │Event Store     │
+│                │  │    Service     │  │   (Optional)   │
 │ - payments     │  │                │  │                │
 │ - points       │  │ - alarm        │  │ - Event Log    │
-│ DB: PostgreSQL │  │ - ranking      │  │ DB: PostgreSQL │
+│    DB: MySQL   │  │ - ranking      │  │    DB: MySQL   │
 │                │  │ Cache: Redis   │  │   or EventDB   │
 └────────────────┘  └────────────────┘  └────────────────┘
         │                   │
@@ -140,7 +140,7 @@ public PayReservationResult payReservation(PayReservationCommand command) {
 
 **기술 스택:**
 - Spring Boot 3.x
-- PostgreSQL
+- MySQL
 - Redis (세션)
 
 ---
@@ -157,7 +157,7 @@ public PayReservationResult payReservation(PayReservationCommand command) {
 
 **기술 스택:**
 - Spring Boot 3.x
-- PostgreSQL
+- MySQL
 - Elasticsearch (검색)
 
 ---
@@ -175,7 +175,7 @@ public PayReservationResult payReservation(PayReservationCommand command) {
 
 **기술 스택:**
 - Spring Boot 3.x
-- PostgreSQL
+- MySQL
 - Redis (대기열, 캐시)
 
 **특징:**
@@ -196,7 +196,7 @@ public PayReservationResult payReservation(PayReservationCommand command) {
 
 **기술 스택:**
 - Spring Boot 3.x
-- PostgreSQL
+- MySQL
 - Redis (멱등성 키)
 
 **특징:**
@@ -217,7 +217,7 @@ public PayReservationResult payReservation(PayReservationCommand command) {
 
 **기술 스택:**
 - Spring Boot 3.x
-- PostgreSQL
+- MySQL
 - Redis (랭킹 캐시)
 - Kafka Consumer
 
@@ -280,16 +280,16 @@ Payment Service ──Kafka──> Reservation Service (예약 확정)
 ┌────────────────────────────────────────┐
 │     Single Transaction (ACID)          │
 │  1. 좌석 홀딩 검증                       │
-│  2. 포인트 차감        ← 실패 시 전체 롤백 │
-│  3. 결제 저장                            │
-│  4. 예약 확정                            │
+│  2. 포인트 차감   ← 실패 시 전체 롤백     │
+│  3. 결제 저장                           │
+│  4. 예약 확정                           │
 └────────────────────────────────────────┘
 
 [MSA 환경]
 ┌──────────────────┐  ┌──────────────────┐  ┌──────────────────┐
 │Reservation Svc   │  │ Payment Service  │  │Notification Svc  │
 │                  │  │                  │  │                  │
-│ 1. 좌석 검증 ✓   │→ │ 2. 포인트 차감 ✗ │→ │ 3. 알림 발송 ?   │
+│  1. 좌석 검증 ✓   │→ │ 2. 포인트 차감 x   │→ │ 3. 알림 발송 ?    │
 │                  │  │                  │  │                  │
 └──────────────────┘  └──────────────────┘  └──────────────────┘
         ↑                      ↑                      ↑
@@ -352,10 +352,10 @@ Availability    Partition
 ```
 ┌────────────────────────────────────┐
 │     Payment Service DB             │
-│  ┌──────────────┐  ┌────────────┐ │
-│  │  payments    │  │  outbox    │ │  ← 같은 트랜잭션
-│  │   (결제)     │  │ (이벤트)   │ │
-│  └──────────────┘  └────────────┘ │
+│  ┌──────────────┐  ┌────────────┐  │
+│  │  payments    │  │  outbox    │  │  ← 같은 트랜잭션
+│  │   (결제)      │  │ (이벤트)   │  │
+│  └──────────────┘  └────────────┘  │
 └────────────────────────────────────┘
            │
            │ Message Relay (별도 프로세스)
@@ -1103,8 +1103,6 @@ public class OutboxMessageRelay {
     }
 }
 ```
-
-이 문서는 계속 작성 중입니다. 다음 섹션을 작성하겠습니다.
 ---
 
 ### 6.2 SAGA Orchestration Pattern 구현
