@@ -14,7 +14,7 @@ import org.springframework.stereotype.Component;
  * 현재는 이벤트 수신 로깅만 수행하며, 향후 알림 발송 로직이 추가될 예정이다.
  */
 @Slf4j
-@Component
+@Component("alarmReservationCompletedKafkaListener")
 @RequiredArgsConstructor
 public class ReservationCompletedKafkaListener {
 

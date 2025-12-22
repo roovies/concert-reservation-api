@@ -22,7 +22,7 @@ import org.springframework.stereotype.Component;
  * SAGA Orchestration 패턴의 일부로, 포인트 적립 성공/실패 이벤트를 발행한다.
  */
 @Slf4j
-@Component
+@Component("pointsReservationCompletedKafkaListener")
 @RequiredArgsConstructor
 public class ReservationCompletedKafkaListener {
 

@@ -9,7 +9,7 @@ import org.springframework.transaction.event.TransactionPhase;
 import org.springframework.transaction.event.TransactionalEventListener;
 
 @Slf4j
-@Component
+@Component("paymentsPaymentEventListener")
 @RequiredArgsConstructor
 public class PaymentEventListener {
 
