@@ -16,6 +16,7 @@ import com.roovies.concertreservation.shared.domain.event.ReservationCompletedKa
 import com.roovies.concertreservation.shared.domain.vo.Amount;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -42,7 +43,7 @@ public class PayReservationService implements PayReservationUseCase {
     private final PaymentPointGatewayPort paymentPointGatewayPort;
     private final PaymentUserGatewayPort paymentUserGatewayPort;
     private final PaymentEventPort paymentEventPort;
-    private final PaymentKafkaEventPort paymentKafkaEventPort;
+    private final ApplicationEventPublisher eventPublisher;
 
     private final ObjectMapper objectMapper;
 
@@ -111,7 +112,8 @@ public class PayReservationService implements PayReservationUseCase {
                     payReservationResult.status(),
                     payReservationResult.completedAt()
             );
-            paymentKafkaEventPort.publishReservationCompleted(kafkaEvent);
+            // 트랜잭션 커밋 완료 후 카프카 이벤트를 발행시키기 위해 인메모리 트랜잭션 완료 이벤트 발행
+            eventPublisher.publishEvent(kafkaEvent);
 
             log.info("[PayReservationService] 홀딩된 좌석 결제 성공 - userId: {}, scheduleId: {}, seatIds: {}",
                     userId, scheduleId, seatIds);

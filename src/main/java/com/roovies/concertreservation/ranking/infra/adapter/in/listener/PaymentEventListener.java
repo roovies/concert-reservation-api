@@ -18,7 +18,7 @@ import org.springframework.stereotype.Component;
  * 실시간 랭킹을 업데이트한다.
  */
 @Slf4j
-@Component
+@Component("rankingPaymentEventListener")
 public class PaymentEventListener {
 
     private static final String PAYMENT_COMPLETED_CHANNEL = "channel:payment:completed";
